@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réviser Byzance et l'Europe carolingienne</title>
+<style>
+  :root {
+    --blue: #1B5FA8;
+    --blue-dk: #10314F;
+    --gold: #C9A227;
+    --green: #2E7D32;
+    --green-bg: #E8F3E6;
+    --amber: #B8860B;
+    --amber-bg: #FCF3D9;
+    --red: #C0392B;
+    --red-bg: #FBE9E7;
+    --ink: #2B2B2B;
+    --paper: #F7F5F2;
+    --white: #FFFFFF;
+    --border: #E0DCD3;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Verdana, "Segoe UI", Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--blue-dk);
+    color: var(--white);
+    padding: 18px 24px 0 24px;
+  }
+  header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+  }
+  header p.sub {
+    margin: 0 0 14px 0;
+    color: #BFDAF2;
+    font-size: 14px;
+    font-style: italic;
+  }
+  nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: transparent;
+    border: none;
+    color: #BFDAF2;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    font-family: inherit;
+  }
+  nav button.active {
+    background: var(--paper);
+    color: var(--blue-dk);
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 20px 60px 20px;
+  }
+  .view { display: none; }
+  .view.active { display: block; }
+  h2 { color: var(--blue-dk); font-size: 20px; margin-top: 0; }
+  h3 { color: var(--blue-dk); font-size: 17px; }
+  .card-panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  /* ---- Dashboard ---- */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .dash-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .dash-card .big {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--blue);
+  }
+  .dash-card .label {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+  }
+  table.calendrier {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+  }
+  table.calendrier th, table.calendrier td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 14px;
+  }
+  table.calendrier th { background: var(--blue); color: var(--white); }
+  .tip-box {
+    background: #FFFBEA;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  button.reset-btn {
+    background: var(--white);
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  /* ---- Flashcards ---- */
+  .flash-progress {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .flashcard-wrap {
+    perspective: 1200px;
+    max-width: 560px;
+    margin: 0 auto;
+    height: 260px;
+  }
+  .flashcard {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .face.recto { background: var(--blue); color: var(--white); }
+  .face.verso { background: var(--white); color: var(--ink); font-size: 17px; font-weight: normal; transform: rotateY(180deg); border: 2px solid var(--blue); }
+  .flash-hint {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .flash-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .flash-actions button {
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--white);
+    font-family: inherit;
+  }
+  .btn-revoir { background: var(--red); }
+  .btn-presque { background: var(--amber); }
+  .btn-sais { background: var(--green); }
+  .flash-actions button:disabled { opacity: 0.35; cursor: default; }
+  .legend {
+    font-size: 12.5px;
+    color: #666;
+    margin-top: 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .done-msg {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .done-msg .emoji { font-size: 40px; }
+  /* ---- QCM ---- */
+  .qcm-progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .qcm-progress-bar > div {
+    height: 100%;
+    background: var(--blue);
+  }
+  .qcm-question { font-size: 17px; font-weight: bold; margin-bottom: 14px; }
+  .qcm-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .qcm-option:hover { border-color: var(--blue); }
+  .qcm-option.selected { border-color: var(--blue); background: #EAF1FA; }
+  .qcm-option.correct { border-color: var(--green); background: var(--green-bg); font-weight: bold; }
+  .qcm-option.incorrect { border-color: var(--red); background: var(--red-bg); }
+  .qcm-explain {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .qcm-nav { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .btn-primary {
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary:disabled { opacity: 0.4; cursor: default; }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--blue);
+    border: 1px solid var(--blue);
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .score-screen { text-align: center; padding: 30px 10px; }
+  .score-screen .score-big { font-size: 44px; font-weight: bold; color: var(--blue); }
+  .missed-list { text-align: left; max-width: 500px; margin: 16px auto; }
+  .missed-list li { margin-bottom: 4px; }
+  /* ---- Rédaction ---- */
+  .redac-item {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .redac-header {
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #EAF1FA;
+  }
+  .redac-header .titre { font-weight: bold; color: var(--blue-dk); }
+  .redac-badge {
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    background: var(--border);
+    color: #555;
+  }
+  .redac-badge.done { background: var(--green-bg); color: var(--green); }
+  .redac-body { padding: 16px 18px; display: none; }
+  .redac-body.open { display: block; }
+  .redac-body textarea {
+    width: 100%;
+    min-height: 90px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+  }
+  .redac-correction {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px dashed var(--gold);
+    border-radius: 8px;
+    display: none;
+  }
+  .redac-correction.open { display: block; }
+  .redac-correction .modele {
+    font-style: italic;
+    color: #444;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .redac-correction label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .redac-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Réviser Byzance et l'Europe carolingienne</h1>
+  <p class="sub">Séquence 1 — Histoire 5e — Méthode de mémorisation espacée</p>
+  <nav>
+    <button data-view="accueil" class="active">Accueil</button>
+    <button data-view="flashcards">Flashcards</button>
+    <button data-view="qcm">QCM</button>
+    <button data-view="redaction">Rédaction</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= ACCUEIL ================= -->
+  <section id="view-accueil" class="view active">
+    <div class="card-panel">
+      <h2>Ta progression</h2>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="big" id="dash-flash">0 / 20</div>
+          <div class="label">Flashcards maîtrisées</div>
+        </div>
+        <div class="dash-card">
+          <div class="big" id="dash-qcm">— / 20</div>
+          <div class="label">Meilleur score au QCM</div>
+        </div>
+        <div class="dash-card">
+          <div class="big" id="dash-redac">0 / 8</div>
+          <div class="label">Questions de rédaction validées</div>
+        </div>
+      </div>
+      <button class="reset-btn" id="btn-reset">Réinitialiser toute ma progression</button>
+    </div>
+
+    <div class="card-panel">
+      <h2>Pourquoi réviser "par petits bouts, plusieurs fois" ?</h2>
+      <p>Le cerveau retient beaucoup mieux une notion si on la revoit <strong>plusieurs fois, avec quelques jours d'écart</strong>, plutôt que tout d'un coup la veille du contrôle. C'est la <strong>répétition espacée</strong> : cet outil s'en sert pour les flashcards — les notions que tu maîtrises reviennent moins souvent, celles qui te posent problème reviennent plus vite.</p>
+      <table class="calendrier">
+        <tr><th>Quand ?</th><th>Ce que tu fais</th></tr>
+        <tr><td>Le jour même du cours</td><td>Relire ta trace écrite + faire les 20 flashcards une première fois</td></tr>
+        <tr><td>J + 1 (le lendemain)</td><td>Refaire les flashcards proposées (celles à revoir reviennent en premier)</td></tr>
+        <tr><td>J + 3</td><td>Flashcards + un tour de QCM</td></tr>
+        <tr><td>J + 7</td><td>Flashcards + QCM + une question de rédaction</td></tr>
+        <tr><td>J + 15 / avant l'évaluation</td><td>QCM complet + toutes les questions de rédaction</td></tr>
+      </table>
+      <div class="tip-box">
+        Astuce : 10 minutes par jour sur plusieurs jours valent mieux qu'une heure la veille. N'hésite pas à revenir sur cette page plusieurs fois dans la semaine — ta progression reste enregistrée sur cet ordinateur.
+      </div>
+    </div>
+
+    <div class="card-panel">
+      <h2>Comment utiliser les trois modules ?</h2>
+      <p><strong>1. Flashcards</strong> — pour mémoriser les dates, personnages et notions. Retourne la carte, puis dis-toi honnêtement si tu savais la réponse.</p>
+      <p><strong>2. QCM</strong> — pour vérifier que tu reconnais les bonnes réponses parmi plusieurs propositions (utile pour un contrôle type QCM).</p>
+      <p><strong>3. Rédaction</strong> — pour t'entraîner à écrire, comme demandé par la nouvelle circulaire du ministère : rédige ta réponse en 2-3 phrases avant de regarder les éléments attendus.</p>
+    </div>
+  </section>
+
+  <!-- ================= FLASHCARDS ================= -->
+  <section id="view-flashcards" class="view">
+    <h2>Flashcards</h2>
+    <div class="flash-progress" id="flash-progress">Chargement…</div>
+
+    <div id="flash-active-zone">
+      <div class="flashcard-wrap">
+        <div class="flashcard" id="flashcard">
+          <div class="face recto" id="flash-recto">…</div>
+          <div class="face verso" id="flash-verso">…</div>
+        </div>
+      </div>
+      <p class="flash-hint">Clique sur la carte pour la retourner</p>
+      <div class="flash-actions">
+        <button class="btn-revoir" id="btn-revoir" disabled>À revoir</button>
+        <button class="btn-presque" id="btn-presque" disabled>Presque</button>
+        <button class="btn-sais" id="btn-sais" disabled>Je sais !</button>
+      </div>
+    </div>
+
+    <div id="flash-done-zone" class="done-msg" style="display:none;">
+      <div class="emoji">✅</div>
+      <p><strong>Aucune carte à réviser aujourd'hui !</strong></p>
+      <p>Reviens demain pour continuer ta répétition espacée, ou révise quand même si tu veux.</p>
+      <button class="btn-secondary" id="btn-force-session">Réviser quand même toutes les cartes</button>
+    </div>
+
+    <div class="legend">
+      <strong>Comment ça marche :</strong> chaque carte a un niveau de 1 à 4. "À revoir" la remet au niveau 1 (elle reviendra vite). "Presque" la garde au même niveau (nouvel essai demain). "Je sais !" la fait monter d'un niveau (elle reviendra plus tard). Une carte au niveau 4 réussie est considérée comme maîtrisée.
+    </div>
+  </section>
+
+  <!-- ================= QCM ================= -->
+  <section id="view-qcm" class="view">
+    <h2>QCM (20 questions)</h2>
+    <div id="qcm-active-zone">
+      <div class="qcm-progress-bar"><div id="qcm-bar" style="width:0%"></div></div>
+      <div class="card-panel">
+        <div class="qcm-question" id="qcm-question">…</div>
+        <div id="qcm-options"></div>
+        <div class="qcm-explain" id="qcm-explain" style="display:none;"></div>
+        <div class="qcm-nav">
+          <span id="qcm-counter" style="font-size:13px;color:#666;"></span>
+          <button class="btn-primary" id="btn-qcm-valider" disabled>Valider</button>
+        </div>
+      </div>
+    </div>
+    <div id="qcm-score-zone" class="score-screen" style="display:none;">
+      <div class="score-big" id="qcm-final-score">0 / 20</div>
+      <p>C'est ton résultat à ce tour de QCM.</p>
+      <div class="missed-list" id="qcm-missed"></div>
+      <button class="btn-primary" id="btn-qcm-restart">Recommencer le QCM</button>
+    </div>
+  </section>
+
+  <!-- ================= REDACTION ================= -->
+  <section id="view-redaction" class="view">
+    <h2>Questions de rédaction</h2>
+    <p>Rédige ta réponse en 2 à 3 phrases dans la zone de texte, <strong>puis seulement</strong> clique sur "Voir les éléments attendus" pour t'autocorriger. Coche les critères que tu as bien traités.</p>
+    <div id="redac-list"></div>
+  </section>
+
+</main>
+
+<footer>Séquence 1 : Byzance et l'Europe carolingienne — Outil de révision — Histoire 5e</footer>
+
+<script>
+/* =======================================================
+   DONNÉES
+   ======================================================= */
+const FLASHCARDS = [
+  {id:1, recto:"395", verso:"Partage de l'Empire romain par l'empereur Théodose entre ses deux fils : Honorius reçoit l'Occident, Arcadius reçoit l'Orient (capitale Constantinople)."},
+  {id:2, recto:"476", verso:"Disparition de l'Empire romain d'Occident : plusieurs royaumes se partagent son territoire."},
+  {id:3, recto:"Empire byzantin", verso:"Nom donné par les historiens à l'Empire romain d'Orient, qui se maintient après 476."},
+  {id:4, recto:"Basileus", verso:"Titre du souverain de l'Empire byzantin ; il gouverne comme un empereur romain mais tient aussi son pouvoir de Dieu."},
+  {id:5, recto:"Sainte-Sophie", verso:"Grande basilique de Constantinople où l'empereur byzantin est couronné par le patriarche."},
+  {id:6, recto:"330", verso:"Fondation de Constantinople par l'empereur Constantin."},
+  {id:7, recto:"Justinien", verso:"Empereur byzantin (527-565) qui fait reconstruire la basilique Sainte-Sophie."},
+  {id:8, recto:"Orthodoxe", verso:"Rite chrétien pratiqué dans l'Empire byzantin."},
+  {id:9, recto:"Grec", verso:"Langue de l'Empire byzantin, qui conserve aussi le droit romain."},
+  {id:10, recto:"800", verso:"Le 25 décembre, à Rome, Charlemagne est couronné « empereur des Romains »."},
+  {id:11, recto:"Léon III", verso:"Pape qui couronne Charlemagne « empereur des Romains » en l'an 800."},
+  {id:12, recto:"768", verso:"Charlemagne devient roi des Francs."},
+  {id:13, recto:"Aix-la-Chapelle", verso:"Capitale de l'empire carolingien, où Charlemagne fait construire son palais et sa chapelle."},
+  {id:14, recto:"Comtes", verso:"Représentants locaux de Charlemagne, chargés de rendre la justice dans leur comté."},
+  {id:15, recto:"Missi dominici", verso:"Envoyés de l'empereur, chargés de contrôler le travail des comtes."},
+  {id:16, recto:"Capitulaires", verso:"Décisions et lois prises par l'empereur carolingien."},
+  {id:17, recto:"Catholique", verso:"Rite chrétien pratiqué dans l'empire carolingien (à Rome, en latin)."},
+  {id:18, recto:"Latin", verso:"Langue de l'empire carolingien."},
+  {id:19, recto:"Patriarche", verso:"Chef religieux qui couronne l'empereur byzantin, à Constantinople."},
+  {id:20, recto:"Pape", verso:"Chef religieux qui couronne l'empereur carolingien, à Rome."},
+];
+
+const QCM = [
+  {q:"En quelle année l'empereur Théodose partage-t-il l'Empire romain entre ses deux fils ?", options:["330","395","476","800"], correct:1, explain:"Théodose partage l'Empire romain en 395, peu avant sa mort : Honorius reçoit l'Occident, Arcadius l'Orient."},
+  {q:"Que se passe-t-il en 476 ?", options:["La fondation de Constantinople","Le sacre de Charlemagne","La disparition de l'Empire romain d'Occident","Le concile de Nicée"], correct:2, explain:"En 476, l'Empire romain d'Occident disparaît : plusieurs royaumes se partagent son territoire."},
+  {q:"Comment les historiens appellent-ils l'Empire romain d'Orient qui se maintient après 476 ?", options:["Empire carolingien","Empire byzantin","Empire franc","Saint Empire"], correct:1, explain:"L'Empire romain d'Orient, qui se maintient après 476, est appelé Empire byzantin par les historiens."},
+  {q:"Quel titre porte le souverain de l'Empire byzantin ?", options:["Empereur des Romains","Basileus","Auguste","Patriarche"], correct:1, explain:"Le souverain byzantin porte le titre de basileus."},
+  {q:"Dans quelle basilique l'empereur byzantin est-il couronné ?", options:["Saint-Pierre de Rome","Sainte-Sophie de Constantinople","Notre-Dame d'Aix-la-Chapelle","Saint-Marc de Venise"], correct:1, explain:"Le couronnement a lieu dans la basilique Sainte-Sophie, à Constantinople."},
+  {q:"En quelle année Constantinople est-elle fondée ?", options:["330","395","476","768"], correct:0, explain:"Constantinople est fondée par l'empereur Constantin en 330."},
+  {q:"Quel empereur byzantin fait reconstruire Sainte-Sophie au VIe siècle ?", options:["Théodose","Constantin","Justinien","Léon III"], correct:2, explain:"Justinien (527-565) fait reconstruire la basilique Sainte-Sophie."},
+  {q:"Quel est le rite chrétien pratiqué dans l'Empire byzantin ?", options:["Catholique","Orthodoxe","Protestant","Copte"], correct:1, explain:"L'Empire byzantin est un empire chrétien de rite orthodoxe."},
+  {q:"Quelle langue est utilisée dans l'Empire byzantin ?", options:["Latin","Grec","Arabe","Francique"], correct:1, explain:"L'Empire byzantin conserve la langue grecque et le droit romain."},
+  {q:"Quand Charlemagne est-il couronné « empereur des Romains » ?", options:["25 décembre 800","25 décembre 768","1er janvier 476","25 décembre 395"], correct:0, explain:"Charlemagne est couronné à Rome le 25 décembre 800."},
+  {q:"Qui couronne Charlemagne « empereur des Romains » ?", options:["Le patriarche de Constantinople","Le pape Léon III","L'empereur Justinien","L'archevêque de Reims"], correct:1, explain:"C'est le pape Léon III qui couronne Charlemagne à Rome."},
+  {q:"En quelle année Charlemagne devient-il roi des Francs ?", options:["768","800","814","843"], correct:0, explain:"Charlemagne devient roi des Francs en 768, avant d'être couronné empereur en 800."},
+  {q:"Quelle ville est la capitale de l'empire carolingien ?", options:["Rome","Paris","Aix-la-Chapelle","Constantinople"], correct:2, explain:"Charlemagne gouverne son empire depuis sa capitale, Aix-la-Chapelle."},
+  {q:"Quel est le rôle des comtes dans l'empire carolingien ?", options:["Ils gardent l'empereur","Ils rendent la justice localement","Ils écrivent les capitulaires","Ils couronnent l'empereur"], correct:1, explain:"Les comtes sont chargés de rendre la justice dans leur comté."},
+  {q:"Quel est le rôle des missi dominici ?", options:["Rendre la justice locale","Contrôler le travail des comtes","Couronner l'empereur","Diriger l'armée byzantine"], correct:1, explain:"Les missi dominici sont envoyés par l'empereur pour contrôler les comtes."},
+  {q:"Comment appelle-t-on les décisions prises par l'empereur carolingien ?", options:["Des basileus","Des capitulaires","Des orthodoxes","Des missi"], correct:1, explain:"Les décisions impériales de Charlemagne sont appelées des capitulaires."},
+  {q:"Quel est le rite chrétien pratiqué dans l'empire carolingien ?", options:["Orthodoxe","Catholique","Copte","Arien"], correct:1, explain:"L'empire carolingien est un empire chrétien de rite catholique."},
+  {q:"Quelle langue est utilisée dans l'empire carolingien ?", options:["Grec","Latin","Francique uniquement","Arabe"], correct:1, explain:"L'empire carolingien est un empire chrétien de langue latine."},
+  {q:"Qui couronne l'empereur byzantin ?", options:["Le pape","Le patriarche","Le peuple seul","Le Sénat"], correct:1, explain:"L'empereur byzantin est couronné par le patriarche, à Constantinople."},
+  {q:"Qui couronne l'empereur carolingien ?", options:["Le patriarche","Le pape","Le peuple seul","L'archevêque de Constantinople"], correct:1, explain:"L'empereur carolingien est couronné par le pape, à Rome."},
+];
+
+const REDACTION = [
+  {id:1, seance:1, question:"En 2 à 3 phrases, explique comment l'Empire romain se transforme entre 395 et 476, et ce qu'il en reste à l'Est.",
+   modele:"En 395, l'empereur Théodose partage l'Empire romain entre ses deux fils. En 476, l'Empire romain d'Occident disparaît. À l'Est, l'Empire romain se maintient : les historiens l'appellent l'Empire byzantin.",
+   criteres:["J'ai cité l'année 395 et le partage par Théodose","J'ai cité l'année 476 et la disparition de l'Empire romain d'Occident","J'ai expliqué que l'Empire romain se maintient à l'Est (Empire byzantin)"]},
+  {id:2, seance:2, question:"En 2 à 3 phrases, explique pourquoi on peut dire que l'empereur byzantin est à la fois un chef romain et un souverain choisi par Dieu.",
+   modele:"L'empereur byzantin porte le titre de basileus et gouverne comme un empereur romain. Mais il tient aussi son pouvoir de Dieu : il est couronné dans la basilique Sainte-Sophie par le patriarche.",
+   criteres:["J'ai cité le titre de basileus","J'ai expliqué l'origine religieuse de son pouvoir (couronnement, patriarche, Sainte-Sophie)","J'ai mentionné son héritage romain (pouvoir politique)"]},
+  {id:3, seance:3, question:"En 2 à 3 phrases, montre en quoi Constantinople est la capitale d'un empire à la fois romain et chrétien.",
+   modele:"Constantinople est fondée par l'empereur Constantin en 330. L'empereur byzantin y est couronné dans la basilique Sainte-Sophie, reconstruite par Justinien. La ville conserve aussi le droit romain et la langue grecque.",
+   criteres:["J'ai cité la fondation par Constantin en 330","J'ai cité un monument religieux (Sainte-Sophie / Justinien)","J'ai mentionné un élément d'héritage romain (droit, administration)"]},
+  {id:4, seance:4, question:"En 2 à 3 phrases, explique comment et pourquoi Charlemagne devient « empereur des Romains » en l'an 800.",
+   modele:"Le 25 décembre 800, à Rome, le pape Léon III couronne Charlemagne « empereur des Romains ». Ce titre montre que Charlemagne se présente comme l'héritier de Rome, tout en tenant son pouvoir de l'Église.",
+   criteres:["J'ai cité la date (800) et le lieu (Rome)","J'ai cité le pape Léon III","J'ai expliqué le sens du titre (héritage romain et chrétien)"]},
+  {id:5, seance:5, question:"En 2 à 3 phrases, explique comment Charlemagne parvient à gouverner un aussi vaste empire.",
+   modele:"Depuis sa capitale d'Aix-la-Chapelle, Charlemagne s'appuie sur les comtes, chargés de rendre la justice localement, et sur les missi dominici, envoyés pour contrôler leur travail. Ses décisions sont appelées des capitulaires.",
+   criteres:["J'ai cité les comtes et leur rôle de justice locale","J'ai cité les missi dominici et leur rôle de contrôle","J'ai mentionné les capitulaires et/ou Aix-la-Chapelle"]},
+  {id:6, seance:6, question:"En 2 à 3 phrases, présente un point commun ET une différence entre l'Empire byzantin et l'Empire carolingien.",
+   modele:"Les deux empires sont des héritiers chrétiens de Rome : c'est un point commun. Mais l'Empire byzantin est de rite orthodoxe et de langue grecque, alors que l'empire carolingien est de rite catholique et de langue latine.",
+   criteres:["J'ai cité un point commun précis (ex. héritiers chrétiens de Rome)","J'ai cité une différence précise (ex. religion, langue, couronnement)","Mes réponses sont justifiées par un exemple"]},
+  {id:7, seance:7, question:"En 2 à 3 phrases, résume comment les deux empires se répartissent autour de la Méditerranée après l'an 800.",
+   modele:"L'Empire byzantin domine l'Est de la Méditerranée depuis Constantinople, tandis que l'empire carolingien domine l'Ouest depuis Aix-la-Chapelle, avec Rome comme lieu du sacre. Chacun se réclame de l'héritage chrétien de Rome, mais de façon différente.",
+   criteres:["J'ai cité les deux empires et une capitale pour chacun","J'ai mentionné leurs religions respectives (orthodoxe / catholique)","J'ai situé au moins une ville clé (Constantinople, Rome ou Aix-la-Chapelle)"]},
+  {id:8, seance:8, question:"En quelques phrases, explique pourquoi on peut dire qu'il existe, entre le VIe et le IXe siècle, deux empereurs romains en même temps.",
+   modele:"À partir de 476, l'Empire romain d'Occident disparaît, mais l'Empire byzantin se maintient à l'Est et son empereur se dit héritier de Rome. En l'an 800, Charlemagne est à son tour couronné « empereur des Romains » par le pape. Les deux souverains se réclament donc tous les deux de l'héritage romain et de la protection de Dieu.",
+   criteres:["J'ai cité les deux empereurs / empires concernés","J'ai expliqué que chacun se réclame de l'héritage de Rome","J'ai mentionné leur légitimité religieuse (Dieu, patriarche ou pape)"]},
+];
+
+/* =======================================================
+   STOCKAGE LOCAL
+   ======================================================= */
+const LS_FLASH = "revision_byz_flash_v1";
+const LS_QCM_BEST = "revision_byz_qcm_best_v1";
+const LS_REDAC = "revision_byz_redac_v1";
+const DAY = 24*60*60*1000;
+const INTERVALS = [1,3,7,14]; // jours, index = box-1
+
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch(e) { return fallback; }
+}
+function saveJSON(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+
+let flashState = loadJSON(LS_FLASH, {});
+let redacState = loadJSON(LS_REDAC, {});
+
+/* =======================================================
+   NAVIGATION
+   ======================================================= */
+document.querySelectorAll("nav button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("view-" + btn.dataset.view).classList.add("active");
+    if (btn.dataset.view === "accueil") refreshDashboard();
+  });
+});
+
+/* =======================================================
+   DASHBOARD
+   ======================================================= */
+function refreshDashboard() {
+  const mastered = FLASHCARDS.filter(c => (flashState[c.id]?.box || 1) >= 4 && flashState[c.id]?.lastResult === "sais").length;
+  document.getElementById("dash-flash").textContent = mastered + " / " + FLASHCARDS.length;
+
+  const best = loadJSON(LS_QCM_BEST, null);
+  document.getElementById("dash-qcm").textContent = (best===null ? "—" : best) + " / " + QCM.length;
+
+  const validated = Object.values(redacState).filter(r => r && r.validated).length;
+  document.getElementById("dash-redac").textContent = validated + " / " + REDACTION.length;
+}
+document.getElementById("btn-reset").addEventListener("click", () => {
+  if (confirm("Effacer toute ta progression (flashcards, meilleur score QCM, rédaction) sur cet appareil ?")) {
+    localStorage.removeItem(LS_FLASH);
+    localStorage.removeItem(LS_QCM_BEST);
+    localStorage.removeItem(LS_REDAC);
+    flashState = {};
+    redacState = {};
+    refreshDashboard();
+    initFlashcards();
+    initRedaction();
+  }
+});
+
+/* =======================================================
+   FLASHCARDS
+   ======================================================= */
+let flashQueue = [];
+let flashIndex = 0;
+let flashForced = false;
+
+function dueCards() {
+  const now = Date.now();
+  return FLASHCARDS.filter(c => {
+    const s = flashState[c.id];
+    return !s || s.next <= now;
+  });
+}
+
+function buildQueue(force) {
+  let list = force ? FLASHCARDS.slice() : dueCards();
+  list.sort((a,b) => (flashState[a.id]?.box || 1) - (flashState[b.id]?.box || 1));
+  // léger mélange à l'intérieur d'un même niveau
+  for (let i = list.length - 1; i > 0; i--) {
+    if (Math.random() < 0.5) {
+      const j = Math.floor(Math.random() * (i+1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+  }
+  return list;
+}
+
+function initFlashcards() {
+  flashForced = false;
+  flashQueue = buildQueue(false);
+  flashIndex = 0;
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  const activeZone = document.getElementById("flash-active-zone");
+  const doneZone = document.getElementById("flash-done-zone");
+  if (flashIndex >= flashQueue.length) {
+    activeZone.style.display = "none";
+    doneZone.style.display = "block";
+    document.getElementById("flash-progress").textContent = "Session terminée : " + flashQueue.length + " carte(s) vue(s).";
+    return;
+  }
+  activeZone.style.display = "block";
+  doneZone.style.display = "none";
+  const card = flashQueue[flashIndex];
+  document.getElementById("flash-progress").textContent = "Carte " + (flashIndex+1) + " / " + flashQueue.length + (flashForced ? " (session complète)" : " (cartes dues aujourd'hui)");
+  document.getElementById("flash-recto").textContent = card.recto;
+  document.getElementById("flash-verso").textContent = card.verso;
+  const el = document.getElementById("flashcard");
+  el.classList.remove("flipped");
+  ["btn-revoir","btn-presque","btn-sais"].forEach(id => document.getElementById(id).disabled = true);
+}
+
+document.getElementById("flashcard").addEventListener("click", function() {
+  this.classList.toggle("flipped");
+  const flipped = this.classList.contains("flipped");
+  ["btn-revoir","btn-presque","btn-sais"].forEach(id => document.getElementById(id).disabled = !flipped);
+});
+
+function rateCard(result) {
+  const card = flashQueue[flashIndex];
+  const s = flashState[card.id] || {box:1, next:0};
+  let box = s.box || 1;
+  if (result === "revoir") { box = 1; }
+  else if (result === "presque") { /* box inchangé */ }
+  else if (result === "sais") { box = Math.min(4, box+1); }
+  const interval = INTERVALS[Math.min(box,4)-1];
+  const next = result === "presque" ? Date.now() + 1*DAY : Date.now() + interval*DAY;
+  flashState[card.id] = {box, next, lastResult: result};
+  saveJSON(LS_FLASH, flashState);
+  flashIndex++;
+  renderFlashcard();
+}
+document.getElementById("btn-revoir").addEventListener("click", () => rateCard("revoir"));
+document.getElementById("btn-presque").addEventListener("click", () => rateCard("presque"));
+document.getElementById("btn-sais").addEventListener("click", () => rateCard("sais"));
+document.getElementById("btn-force-session").addEventListener("click", () => {
+  flashForced = true;
+  flashQueue = buildQueue(true);
+  flashIndex = 0;
+  renderFlashcard();
+});
+
+/* =======================================================
+   QCM
+   ======================================================= */
+let qcmOrder = [];
+let qcmIndex = 0;
+let qcmScore = 0;
+let qcmAnswered = false;
+let qcmMissed = [];
+
+function shuffledIndices(n) {
+  const arr = Array.from({length:n}, (_,i) => i);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function initQCM() {
+  qcmOrder = shuffledIndices(QCM.length);
+  qcmIndex = 0;
+  qcmScore = 0;
+  qcmMissed = [];
+  document.getElementById("qcm-active-zone").style.display = "block";
+  document.getElementById("qcm-score-zone").style.display = "none";
+  renderQCM();
+}
+
+function renderQCM() {
+  const q = QCM[qcmOrder[qcmIndex]];
+  qcmAnswered = false;
+  document.getElementById("qcm-bar").style.width = Math.round((qcmIndex/QCM.length)*100) + "%";
+  document.getElementById("qcm-counter").textContent = "Question " + (qcmIndex+1) + " / " + QCM.length;
+  document.getElementById("qcm-question").textContent = q.q;
+  document.getElementById("qcm-explain").style.display = "none";
+  document.getElementById("qcm-explain").textContent = "";
+  const optWrap = document.getElementById("qcm-options");
+  optWrap.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const b = document.createElement("button");
+    b.className = "qcm-option";
+    b.textContent = opt;
+    b.addEventListener("click", () => selectOption(i));
+    optWrap.appendChild(b);
+  });
+  document.getElementById("btn-qcm-valider").disabled = true;
+  document.getElementById("btn-qcm-valider").textContent = "Valider";
+}
+
+let qcmSelected = null;
+function selectOption(i) {
+  if (qcmAnswered) return;
+  qcmSelected = i;
+  document.querySelectorAll(".qcm-option").forEach((el, idx) => {
+    el.classList.toggle("selected", idx === i);
+  });
+  document.getElementById("btn-qcm-valider").disabled = false;
+}
+
+document.getElementById("btn-qcm-valider").addEventListener("click", () => {
+  if (!qcmAnswered) {
+    // valider la réponse
+    const q = QCM[qcmOrder[qcmIndex]];
+    qcmAnswered = true;
+    const opts = document.querySelectorAll(".qcm-option");
+    opts.forEach((el, idx) => {
+      if (idx === q.correct) el.classList.add("correct");
+      else if (idx === qcmSelected) el.classList.add("incorrect");
+    });
+    if (qcmSelected === q.correct) qcmScore++;
+    else qcmMissed.push(q.q);
+    document.getElementById("qcm-explain").style.display = "block";
+    document.getElementById("qcm-explain").textContent = q.explain;
+    document.getElementById("btn-qcm-valider").textContent = (qcmIndex < QCM.length-1) ? "Question suivante" : "Voir mon score";
+    qcmSelected = null;
+  } else {
+    qcmIndex++;
+    if (qcmIndex >= QCM.length) {
+      finishQCM();
+    } else {
+      renderQCM();
+    }
+  }
+});
+
+function finishQCM() {
+  document.getElementById("qcm-active-zone").style.display = "none";
+  document.getElementById("qcm-score-zone").style.display = "block";
+  document.getElementById("qcm-final-score").textContent = qcmScore + " / " + QCM.length;
+  const best = loadJSON(LS_QCM_BEST, null);
+  if (best === null || qcmScore > best) saveJSON(LS_QCM_BEST, qcmScore);
+  const missedWrap = document.getElementById("qcm-missed");
+  if (qcmMissed.length === 0) {
+    missedWrap.innerHTML = "<p>Aucune erreur, bravo !</p>";
+  } else {
+    missedWrap.innerHTML = "<p>Notions à revoir en priorité dans les flashcards :</p><ul>" +
+      qcmMissed.map(m => "<li>" + m + "</li>").join("") + "</ul>";
+  }
+}
+document.getElementById("btn-qcm-restart").addEventListener("click", initQCM);
+
+/* =======================================================
+   RÉDACTION
+   ======================================================= */
+function initRedaction() {
+  const wrap = document.getElementById("redac-list");
+  wrap.innerHTML = "";
+  REDACTION.forEach(item => {
+    const state = redacState[item.id] || {answer:"", checked:[false,false,false], validated:false};
+    const div = document.createElement("div");
+    div.className = "redac-item";
+    div.innerHTML = `
+      <div class="redac-header" data-id="${item.id}">
+        <span class="titre">Séance ${item.seance} — ${item.question}</span>
+        <span class="redac-badge ${state.validated ? 'done' : ''}">${state.validated ? 'Validé' : 'À faire'}</span>
+      </div>
+      <div class="redac-body" id="redac-body-${item.id}">
+        <textarea id="redac-textarea-${item.id}" placeholder="Écris ta réponse ici (2 à 3 phrases)...">${state.answer || ""}</textarea>
+        <div class="redac-actions">
+          <button class="btn-secondary" data-show-correction="${item.id}">Voir les éléments attendus</button>
+        </div>
+        <div class="redac-correction" id="redac-correction-${item.id}">
+          <div class="modele"><strong>Exemple de réponse possible :</strong> ${item.modele}</div>
+          <strong>Coche ce que tu as fait :</strong>
+          ${item.criteres.map((c, i) => `
+            <label><input type="checkbox" data-redac-check="${item.id}" data-index="${i}" ${state.checked[i] ? "checked" : ""}> ${c}</label>
+          `).join("")}
+          <div class="redac-actions">
+            <button class="btn-primary" data-validate="${item.id}">${state.validated ? "Marquer à refaire" : "Marquer cette question comme validée"}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  // ouverture/fermeture
+  wrap.querySelectorAll(".redac-header").forEach(h => {
+    h.addEventListener("click", () => {
+      const id = h.dataset.id;
+      document.getElementById("redac-body-" + id).classList.toggle("open");
+    });
+  });
+  // sauvegarde du texte au fil de la frappe
+  REDACTION.forEach(item => {
+    const ta = document.getElementById("redac-textarea-" + item.id);
+    ta.addEventListener("input", () => {
+      const state = redacState[item.id] || {answer:"", checked:[false,false,false], validated:false};
+      state.answer = ta.value;
+      redacState[item.id] = state;
+      saveJSON(LS_REDAC, redacState);
+    });
+  });
+  // afficher la correction
+  wrap.querySelectorAll("[data-show-correction]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("redac-correction-" + btn.dataset.showCorrection).classList.add("open");
+    });
+  });
+  // cases à cocher
+  wrap.querySelectorAll("[data-redac-check]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const id = cb.dataset.redacCheck;
+      const idx = parseInt(cb.dataset.index, 10);
+      const state = redacState[id] || {answer:"", checked:[false,false,false], validated:false};
+      state.checked[idx] = cb.checked;
+      redacState[id] = state;
+      saveJSON(LS_REDAC, redacState);
+    });
+  });
+  // valider la question
+  wrap.querySelectorAll("[data-validate]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.validate;
+      const state = redacState[id] || {answer:"", checked:[false,false,false], validated:false};
+      state.validated = !state.validated;
+      redacState[id] = state;
+      saveJSON(LS_REDAC, redacState);
+      initRedaction();
+      refreshDashboard();
+    });
+  });
+}
+
+/* =======================================================
+   INITIALISATION
+   ======================================================= */
+refreshDashboard();
+initFlashcards();
+initQCM();
+initRedaction();
+</script>
+</body>
+</html>
