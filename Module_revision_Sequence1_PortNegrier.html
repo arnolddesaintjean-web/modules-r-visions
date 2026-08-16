@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module de révision — Enquête sur un port négrier</title>
+<style>
+  :root {
+    --blue: #1B5FA8;
+    --darkblue: #10314F;
+    --green: #1E8449;
+    --orange: #E07B1D;
+    --red: #B03A2E;
+    --creme: #F7F5F2;
+    --cremeborder: #E0DCD3;
+    --textdark: #1A1A1A;
+    --gray: #6b6b6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Lexie Readable", "Comic Sans MS", "Segoe UI", Arial, sans-serif;
+    background: #f4f6f8;
+    color: var(--textdark);
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: var(--darkblue);
+    color: white;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  header .subtitle {
+    font-size: 0.85rem;
+    color: #C9D6E3;
+    font-style: italic;
+    margin-top: 2px;
+  }
+  nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: transparent;
+    border: 2px solid #4A7FB5;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  nav button:hover { background: #26456f; }
+  nav button.active { background: var(--blue); border-color: var(--blue); font-weight: 700; }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 18px 60px;
+  }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  h2.section-title {
+    color: var(--darkblue);
+    border-bottom: 3px solid var(--blue);
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+
+  /* Dashboard */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 20px 0 28px;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--cremeborder);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stat-card .big {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .stat-card .label {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+  .calendar-box {
+    background: var(--creme);
+    border: 1px solid var(--cremeborder);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .calendar-box h3 { margin-top: 0; color: var(--darkblue); }
+  .calendar-steps {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .calendar-step {
+    background: white;
+    border: 1px solid var(--cremeborder);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--darkblue);
+  }
+  #reset-btn {
+    background: white;
+    border: 2px solid var(--red);
+    color: var(--red);
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+  #reset-btn:hover { background: #fbeceb; }
+
+  /* Flashcards */
+  .flash-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .flash-progress {
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+  .flashcard {
+    width: 100%;
+    max-width: 520px;
+    height: 260px;
+    perspective: 1200px;
+    cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flash-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  }
+  .flash-front { background: var(--blue); color: white; }
+  .flash-back { background: white; color: var(--textdark); transform: rotateY(180deg); font-size: 1.05rem; font-weight: 400; border: 2px solid var(--blue); }
+  .flash-hint { font-size: 0.8rem; color: #dbe7f5; font-weight: 400; margin-top: 10px; }
+
+  .eval-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .eval-buttons button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+  }
+  .btn-revoir { background: var(--red); }
+  .btn-presque { background: var(--orange); }
+  .btn-sais { background: var(--green); }
+  .eval-buttons button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray);
+  }
+  .empty-state .big-check { font-size: 3rem; }
+
+  /* QCM */
+  .qcm-question {
+    background: white;
+    border: 1px solid var(--cremeborder);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .qcm-question .qnum {
+    font-size: 0.8rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .qcm-question h3 { margin: 6px 0 14px; color: var(--darkblue); }
+  .qcm-options { display: flex; flex-direction: column; gap: 8px; }
+  .qcm-option {
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid var(--cremeborder);
+    background: var(--creme);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  .qcm-option:hover { border-color: var(--blue); }
+  .qcm-option.correct { background: #e3f3e8; border-color: var(--green); font-weight: 700; }
+  .qcm-option.incorrect { background: #fbeceb; border-color: var(--red); }
+  .qcm-option[disabled] { cursor: default; }
+  .qcm-explain {
+    margin-top: 10px;
+    font-size: 0.88rem;
+    color: var(--darkblue);
+    background: #eef4fa;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: none;
+  }
+  .qcm-nav { display: flex; justify-content: space-between; margin-top: 10px; }
+  .qcm-nav button {
+    background: var(--blue); color: white; border: none; padding: 10px 20px;
+    border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 700;
+  }
+  .qcm-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .qcm-result { text-align: center; padding: 20px; }
+  .qcm-result .score { font-size: 2.4rem; font-weight: 700; color: var(--blue); }
+  .qcm-result ul { text-align: left; max-width: 420px; margin: 16px auto; }
+
+  /* Rédaction */
+  .redac-block {
+    background: white;
+    border: 1px solid var(--cremeborder);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .redac-block h3 { color: var(--darkblue); margin-top: 0; }
+  .redac-block textarea {
+    width: 100%;
+    min-height: 110px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+  }
+  .redac-block .reveal-btn {
+    margin-top: 10px;
+    background: var(--orange);
+    color: white;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+  }
+  .redac-model {
+    display: none;
+    margin-top: 14px;
+    background: var(--creme);
+    border: 1px solid var(--cremeborder);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .redac-model .label { font-weight: 700; color: var(--darkblue); margin-bottom: 6px; }
+  .redac-criteria { margin-top: 12px; }
+  .redac-criteria label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  .validated-badge {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: 10px;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.8rem;
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Module de révision</h1>
+    <div class="subtitle">Séq. 1 — Enquête sur un port négrier</div>
+  </div>
+  <nav>
+    <button data-view="accueil" class="active">Accueil</button>
+    <button data-view="flashcards">Flashcards</button>
+    <button data-view="qcm">QCM</button>
+    <button data-view="redaction">Rédaction</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ACCUEIL -->
+  <section id="view-accueil" class="view active">
+    <h2 class="section-title">Tableau de bord</h2>
+    <div class="cards-row">
+      <div class="stat-card">
+        <div class="big" id="stat-cartes">0 / 20</div>
+        <div class="label">Cartes maîtrisées</div>
+      </div>
+      <div class="stat-card">
+        <div class="big" id="stat-qcm">— / 20</div>
+        <div class="label">Meilleur score QCM</div>
+      </div>
+      <div class="stat-card">
+        <div class="big" id="stat-redac">0 / 8</div>
+        <div class="label">Questions de rédaction validées</div>
+      </div>
+    </div>
+
+    <div class="calendar-box">
+      <h3>La méthode de répétition espacée</h3>
+      <p>Pour bien mémoriser, mieux vaut revoir une notion plusieurs fois, à des intervalles de plus en plus espacés, plutôt que de la réviser en une seule fois pendant longtemps. C'est le principe des flashcards : plus tu maîtrises une carte, plus l'intervalle avant de la revoir s'allonge, selon ce calendrier :</p>
+      <div class="calendar-steps">
+        <div class="calendar-step">Jour J</div>
+        <div class="calendar-step">→ J+1</div>
+        <div class="calendar-step">→ J+3</div>
+        <div class="calendar-step">→ J+7</div>
+        <div class="calendar-step">→ J+14 (maîtrisée)</div>
+      </div>
+    </div>
+
+    <p style="color:var(--gray); font-size:0.9rem;">Ta progression est enregistrée automatiquement sur cet appareil (mémoire du navigateur). Si tu changes d'ordinateur, elle repart à zéro.</p>
+
+    <button id="reset-btn">Réinitialiser toute ma progression</button>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section id="view-flashcards" class="view">
+    <h2 class="section-title">Flashcards</h2>
+    <div class="flash-wrap">
+      <div class="flash-progress" id="flash-progress">—</div>
+      <div id="flash-area"></div>
+    </div>
+  </section>
+
+  <!-- QCM -->
+  <section id="view-qcm" class="view">
+    <h2 class="section-title">QCM</h2>
+    <div id="qcm-area"></div>
+  </section>
+
+  <!-- REDACTION -->
+  <section id="view-redaction" class="view">
+    <h2 class="section-title">Questions de rédaction</h2>
+    <p style="color:var(--gray)">Rédige ta réponse, puis clique sur « Voir les éléments attendus » pour te corriger toi-même.</p>
+    <div id="redac-area"></div>
+  </section>
+
+</main>
+
+<footer>Module de révision autonome — Histoire 4e, Séquence « Enquête sur un port négrier ».</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE_KEY = "portnegrier_revision_v1";
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { cards: {}, qcmBest: 0, redacValidated: {} };
+  }
+  function saveState() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  }
+  var state = loadState();
+
+  // ---------------------------------------------------------------
+  // DATA
+  // ---------------------------------------------------------------
+  var FLASHCARDS = [
+    { id: "d1716", front: "1716", back: "Gérard Mellier écrit un texte justifiant la traite négrière (Nantes)." },
+    { id: "d1756", front: "1756", back: "Olaudah Equiano, capturé à onze ans, est acheté par des négriers européens." },
+    { id: "d1769", front: "1769-1773", back: "4 expéditions de traite de la Marie-Séraphique (1 344 captifs déportés au total)." },
+    { id: "d1780", front: "1780", back: "François Bonnaffé se fait construire son hôtel particulier, au cœur de Bordeaux." },
+    { id: "d1791", front: "1791", back: "Début de la révolte des esclaves de Saint-Domingue." },
+    { id: "d1794", front: "1794", back: "Première abolition de l'esclavage en France." },
+    { id: "d1802", front: "1802", back: "Rétablissement de l'esclavage par Napoléon Bonaparte." },
+    { id: "d1809", front: "1809", back: "Mort de François Bonnaffé, à la tête d'une fortune de plus de 5 millions de livres." },
+    { id: "d1848", front: "1848", back: "Abolition définitive de l'esclavage en France." },
+    { id: "d2012", front: "2012", back: "Inauguration du Mémorial de l'abolition de l'esclavage à Nantes." },
+    { id: "v1", front: "Commerce triangulaire", back: "Échange entre l'Europe, l'Afrique et les Antilles en 3 étapes : produits manufacturés, puis captifs, puis denrées coloniales." },
+    { id: "v2", front: "Traite négrière", back: "Capture, déportation et vente forcée d'êtres humains réduits en esclavage." },
+    { id: "v3", front: "Commerce en droiture", back: "Commerce colonial direct entre la métropole et les Antilles, sans passer par l'Afrique." },
+    { id: "v4", front: "Armateur", back: "Personne qui finance et équipe un navire pour une expédition." },
+    { id: "v5", front: "Économie de plantation", back: "Monoculture d'exportation (ex. canne à sucre) reposant sur le travail forcé des esclaves." },
+    { id: "v6", front: "Bourgeoisie marchande", back: "Classe sociale enrichie par le commerce (négociants, armateurs)." },
+    { id: "p1", front: "Gérard Mellier", back: "Subdélégué de l'intendant de Bretagne à Nantes, puis maire. Écrit en 1716 un texte justifiant la traite." },
+    { id: "p2", front: "Jacques-Barthélemy Gruel", back: "Armateur nantais qui achète le navire la Marie-Séraphique en 1769." },
+    { id: "p3", front: "Olaudah Equiano", back: "Esclave affranchi. Témoigne des conditions de la traversée dans Ma Véridique Histoire (1789)." },
+    { id: "p4", front: "François Bonnaffé", back: "Négociant bordelais (1723-1809), exemple de l'ascension sociale liée au commerce colonial." }
+  ];
+
+  var QCM = [
+    { q: "En quelle année Gérard Mellier écrit-il son texte justifiant la traite ?", options: ["1716", "1756", "1780", "1848"], correct: 0, explain: "Mellier écrit ce texte en 1716, à Nantes." },
+    { q: "À quel âge Olaudah Equiano est-il capturé, avant d'être acheté en 1756 ?", options: ["8 ans", "onze ans", "16 ans", "20 ans"], correct: 1, explain: "Equiano est capturé à onze ans." },
+    { q: "Combien de captifs la Marie-Séraphique déporte-t-elle au total lors de ses 4 expéditions (1769-1773) ?", options: ["307", "500", "1 344", "4 400"], correct: 2, explain: "1 344 captifs au total sur les 4 expéditions ; 307 pour la seule 4e expédition." },
+    { q: "Que fait construire François Bonnaffé en 1780 ?", options: ["Un navire", "Une plantation", "Son hôtel particulier", "Un mémorial"], correct: 2, explain: "En 1780, Bonnaffé se fait construire son hôtel particulier à Bordeaux." },
+    { q: "Que se passe-t-il à Saint-Domingue en 1791 ?", options: ["L'abolition de l'esclavage", "Le début de la révolte des esclaves", "La mort de Bonnaffé", "La construction du Mémorial"], correct: 1, explain: "1791 marque le début de la révolte des esclaves de Saint-Domingue." },
+    { q: "Quelle date correspond à la première abolition de l'esclavage en France ?", options: ["1791", "1794", "1802", "1848"], correct: 1, explain: "L'esclavage est aboli une première fois en 1794." },
+    { q: "Qui rétablit l'esclavage en France, en 1802 ?", options: ["Louis XVI", "Napoléon Bonaparte", "Gérard Mellier", "François Bonnaffé"], correct: 1, explain: "Napoléon Bonaparte rétablit l'esclavage en 1802." },
+    { q: "Quelle est la fortune de François Bonnaffé à sa mort en 1809 ?", options: ["Plus de 5 millions de livres", "15 millions de livres", "400 000 livres", "1 344 livres"], correct: 0, explain: "À sa mort en 1809, la fortune de Bonnaffé dépasse 5 millions de livres." },
+    { q: "En quelle année l'esclavage est-il aboli définitivement en France ?", options: ["1802", "1809", "1848", "2012"], correct: 2, explain: "L'abolition définitive date de 1848." },
+    { q: "Qu'inaugure-t-on à Nantes en 2012 ?", options: ["Un nouveau port", "Le Mémorial de l'abolition de l'esclavage", "Une statue de Bonnaffé", "Un musée de la Marie-Séraphique"], correct: 1, explain: "Le Mémorial de l'abolition de l'esclavage est inauguré à Nantes en 2012." },
+    { q: "Que désigne le « commerce triangulaire » ?", options: ["Un commerce entre 3 ports français", "Un échange en 3 étapes entre Europe, Afrique et Antilles", "Le commerce direct entre la métropole et les Antilles", "Le commerce de trois négociants associés"], correct: 1, explain: "Le commerce triangulaire relie l'Europe, l'Afrique et les Antilles en 3 étapes." },
+    { q: "Comment appelle-t-on la capture, la déportation et la vente forcée d'êtres humains réduits en esclavage ?", options: ["Le commerce en droiture", "L'économie de plantation", "La traite négrière", "La bourgeoisie marchande"], correct: 2, explain: "C'est la définition de la traite négrière." },
+    { q: "Qu'est-ce que le « commerce en droiture » ?", options: ["Le commerce direct métropole-Antilles, sans passer par l'Afrique", "Le commerce triangulaire complet", "La vente d'esclaves aux Antilles", "Le commerce du sucre uniquement"], correct: 0, explain: "Le commerce en droiture évite l'étape africaine : il relie directement la métropole aux Antilles." },
+    { q: "Comment appelle-t-on la personne qui finance et équipe un navire pour une expédition ?", options: ["Le capitaine", "Le négociant", "L'armateur", "Le planteur"], correct: 2, explain: "L'armateur finance et équipe le navire ; le capitaine le commande en mer." },
+    { q: "Qu'est-ce qu'une économie de plantation ?", options: ["Un petit jardin vivrier", "Une monoculture d'exportation reposant sur le travail forcé des esclaves", "Un marché aux esclaves", "Une ferme familiale libre"], correct: 1, explain: "L'économie de plantation repose sur une monoculture d'exportation (ex. canne à sucre) et le travail forcé." },
+    { q: "Qui forme la « bourgeoisie marchande » ?", options: ["Les esclaves affranchis", "Les capitaines de navire uniquement", "La classe sociale enrichie par le commerce (négociants, armateurs)", "Les ouvriers des ports"], correct: 2, explain: "La bourgeoisie marchande regroupe les négociants et armateurs enrichis par le commerce." },
+    { q: "Qui est Gérard Mellier ?", options: ["Un armateur nantais", "Un esclave affranchi", "Subdélégué puis maire de Nantes, qui justifie la traite en 1716", "Un négociant bordelais"], correct: 2, explain: "Gérard Mellier est subdélégué de l'intendant de Bretagne à Nantes, puis maire." },
+    { q: "Qui achète le navire la Marie-Séraphique en 1769 ?", options: ["Jacques-Barthélemy Gruel", "François Bonnaffé", "Claude-Vincent Polony", "Gérard Mellier"], correct: 0, explain: "L'armateur Jacques-Barthélemy Gruel achète la Marie-Séraphique en 1769." },
+    { q: "Dans quel texte Olaudah Equiano témoigne-t-il des conditions de la traversée ?", options: ["Réponses au mémoire (1716)", "Ma Véridique Histoire (1789)", "Bordeaux il y a cent ans (1887)", "Histoire des services à la mer (1828)"], correct: 1, explain: "Equiano publie son témoignage dans Ma Véridique Histoire, en 1789." },
+    { q: "Que révèle l'exemple de François Bonnaffé ?", options: ["La justification religieuse de la traite", "L'ascension sociale d'un négociant grâce au commerce atlantique", "Les conditions de la traversée", "L'abolition de l'esclavage"], correct: 1, explain: "Bonnaffé illustre comment le commerce atlantique permet l'enrichissement et l'ascension sociale d'un négociant." }
+  ];
+
+  var REDACTION = [
+    { seance: "Séance 1", prompt: "Explique pourquoi Nantes est considérée comme le premier port négrier de France.", model: "Nantes a organisé environ 1 800 expéditions négrières au XVIIIe siècle, déportant plus de 550 000 Africains. C'est bien plus que les autres grands ports français (Le Havre, Bordeaux, La Rochelle), ce qui en fait le premier port négrier français.", criteres: ["J'ai donné au moins un chiffre précis (nombre d'expéditions ou de personnes déportées).", "J'ai comparé Nantes aux autres grands ports.", "Ma réponse est rédigée en phrases complètes."] },
+    { seance: "Séance 2", prompt: "Compare les 4 grands ports négriers français.", model: "Les 4 grands ports négriers français sont, sur la façade atlantique, Nantes, Le Havre, Bordeaux et La Rochelle. Nantes domine largement avec environ 1 800 expéditions, loin devant Le Havre (≈520) et Bordeaux/La Rochelle, à égalité (≈480 chacun).", criteres: ["J'ai cité les 4 ports.", "J'ai comparé leur importance (au moins un chiffre).", "J'ai précisé qu'ils sont tous sur la façade atlantique."] },
+    { seance: "Séance 3", prompt: "Explique comment, au XVIIIe siècle, certains ont cherché à justifier le commerce des esclaves, et pourquoi ces arguments ne résistent pas à l'examen critique.", model: "En 1716, Gérard Mellier avance trois arguments pour justifier la traite : un argument économique (elle enrichit Nantes), un argument religieux (les esclaves reçoivent le baptême) et un argument sur la « nature » des Africains (ils seraient adaptés à ce travail). Ces arguments ne résistent pas à l'examen critique : ils servent avant tout à justifier un intérêt économique et reposent sur des préjugés, pas sur des faits.", criteres: ["J'ai cité au moins deux des trois arguments de Mellier.", "J'ai expliqué pourquoi ces arguments posent problème aujourd'hui.", "J'ai utilisé le mot « esprit critique »."] },
+    { seance: "Séance 4", prompt: "Explique comment s'organise une expédition de traite depuis Nantes.", model: "Une expédition de traite est financée et équipée par un armateur (par exemple Jacques-Barthélemy Gruel), tandis qu'un capitaine (Jean-Baptiste Fautrel Gaugy pour la Marie-Séraphique) commande le navire en mer. Le trajet suit le commerce triangulaire : départ de Nantes avec des marchandises, échange contre des captifs sur les côtes d'Afrique, vente aux Antilles, puis retour à Nantes.", criteres: ["J'ai distingué le rôle de l'armateur et celui du capitaine.", "J'ai décrit les 3 étapes du trajet triangulaire.", "J'ai utilisé le mot « expédition »."] },
+    { seance: "Séance 5", prompt: "Explique ce que révèle un document d'époque sur les conditions de la déportation à bord d'un navire négrier.", model: "Le témoignage d'Olaudah Equiano décrit des conditions terribles : des captifs entassés sous le pont, la chaleur étouffante, l'air irrespirable, les maladies, le bruit des chaînes et les décès pendant la traversée. Ce témoignage écrit révèle une réalité que les images seules, comme l'aquarelle de la Marie-Séraphique, ne montrent pas complètement.", criteres: ["J'ai cité au moins deux conditions difficiles décrites par Equiano.", "J'ai expliqué l'intérêt de croiser une image et un témoignage écrit.", "J'ai utilisé le mot « déportation »."] },
+    { seance: "Séance 6", prompt: "Explique comment l'économie de plantation aux Antilles repose sur le travail des esclaves déportés.", model: "L'économie de plantation aux Antilles repose sur une monoculture d'exportation, comme la canne à sucre. Ce sont les esclaves déportés par la traite qui défrichent, cultivent et transforment cette production, dans des conditions très dures. Sans ce travail forcé, il n'y aurait ni sucre à exporter, ni profit pour les colons et les négociants : la plantation est le débouché final du commerce triangulaire.", criteres: ["J'ai expliqué ce qu'est une monoculture d'exportation.", "J'ai relié le travail des esclaves à la plantation.", "J'ai fait le lien avec le commerce triangulaire."] },
+    { seance: "Séance 7", prompt: "Explique comment le commerce atlantique permet l'ascension sociale d'un négociant comme François Bonnaffé.", model: "François Bonnaffé arrive à Bordeaux en 1740 comme simple commis négociant. Grâce à ses nombreuses expéditions commerciales vers les Antilles (plus de 37 entre 1768 et 1777), il devient un négociant très riche : en 1780, il se fait construire un hôtel particulier au cœur de Bordeaux, et sa fortune dépasse 5 millions de livres à sa mort en 1809.", criteres: ["J'ai cité au moins une date clé de l'ascension de Bonnaffé.", "J'ai expliqué le lien entre ses expéditions et sa richesse.", "J'ai cité un signe visible de sa réussite (hôtel particulier, fortune)."] },
+    { seance: "Séance 8", prompt: "Réponds à la problématique de la séquence : comment le commerce triangulaire et les grands négoces internationaux transforment-ils l'Europe et l'Atlantique au XVIIIe siècle ?", model: "Le commerce triangulaire relie l'Europe, l'Afrique et les Antilles : les navires partent de ports comme Nantes ou Bordeaux avec des marchandises, échangent des captifs sur les côtes africaines, puis vendent ces captifs comme esclaves aux Antilles avant de revenir chargés de denrées coloniales (sucre, tabac, coton). Ce commerce enrichit une bourgeoisie marchande (comme François Bonnaffé) et repose entièrement sur la déportation et l'exploitation d'êtres humains. Cette histoire reste présente aujourd'hui, par exemple à travers le Mémorial de l'abolition de l'esclavage à Nantes.", criteres: ["J'ai utilisé au moins 3 mots du vocabulaire de la séquence.", "J'ai cité un exemple précis étudié en classe (port, navire ou négociant).", "J'ai mentionné un lien avec la mémoire de cette histoire aujourd'hui."] }
+  ];
+
+  var LEVEL_INTERVALS_DAYS = [0, 1, 3, 7, 14];
+  var DAY_MS = 24 * 60 * 60 * 1000;
+
+  function getCardState(id) {
+    if (!state.cards[id]) state.cards[id] = { level: 0, due: 0 };
+    return state.cards[id];
+  }
+
+  function isDue(cardState) {
+    return cardState.due <= Date.now();
+  }
+
+  // ---------------------------------------------------------------
+  // NAVIGATION
+  // ---------------------------------------------------------------
+  var navButtons = document.querySelectorAll("nav button");
+  navButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      showView(btn.getAttribute("data-view"));
+    });
+  });
+
+  function showView(name) {
+    document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+    document.getElementById("view-" + name).classList.add("active");
+    navButtons.forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-view") === name);
+    });
+    if (name === "flashcards") renderFlashcards();
+    if (name === "qcm") renderQcmStart();
+    if (name === "redaction") renderRedaction();
+    if (name === "accueil") renderDashboard();
+  }
+
+  // ---------------------------------------------------------------
+  // DASHBOARD
+  // ---------------------------------------------------------------
+  function renderDashboard() {
+    var mastered = 0;
+    FLASHCARDS.forEach(function (c) {
+      var cs = getCardState(c.id);
+      if (cs.level >= 4) mastered++;
+    });
+    document.getElementById("stat-cartes").textContent = mastered + " / " + FLASHCARDS.length;
+    document.getElementById("stat-qcm").textContent = (state.qcmBest || state.qcmBest === 0 ? state.qcmBest : "—") + " / " + QCM.length;
+    if (!("qcmBest" in state) || state.qcmBest === undefined || state.qcmBest === null) {
+      document.getElementById("stat-qcm").textContent = "— / " + QCM.length;
+    } else {
+      document.getElementById("stat-qcm").textContent = state.qcmBest + " / " + QCM.length;
+    }
+    var validatedCount = Object.keys(state.redacValidated || {}).filter(function (k) { return state.redacValidated[k]; }).length;
+    document.getElementById("stat-redac").textContent = validatedCount + " / " + REDACTION.length;
+  }
+
+  document.getElementById("reset-btn").addEventListener("click", function () {
+    if (confirm("Réinitialiser toute ta progression (flashcards, score QCM, questions de rédaction) ? Cette action est irréversible.")) {
+      state = { cards: {}, qcmBest: null, redacValidated: {} };
+      saveState();
+      renderDashboard();
+      alert("Progression réinitialisée.");
+    }
+  });
+
+  // ---------------------------------------------------------------
+  // FLASHCARDS
+  // ---------------------------------------------------------------
+  var flashQueue = [];
+  var flashIndex = 0;
+
+  function buildFlashQueue() {
+    flashQueue = FLASHCARDS.filter(function (c) { return isDue(getCardState(c.id)); });
+    // shuffle
+    for (var i = flashQueue.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = flashQueue[i]; flashQueue[i] = flashQueue[j]; flashQueue[j] = tmp;
+    }
+    flashIndex = 0;
+  }
+
+  function renderFlashcards() {
+    buildFlashQueue();
+    renderCurrentCard();
+  }
+
+  function renderCurrentCard() {
+    var area = document.getElementById("flash-area");
+    var progress = document.getElementById("flash-progress");
+    var mastered = FLASHCARDS.filter(function (c) { return getCardState(c.id).level >= 4; }).length;
+
+    if (flashQueue.length === 0) {
+      progress.textContent = mastered + " / " + FLASHCARDS.length + " cartes maîtrisées";
+      area.innerHTML = '<div class="empty-state"><div class="big-check">✓</div><p>Aucune carte à revoir pour le moment !</p><p>Reviens plus tard selon le calendrier de révision espacée, ou consulte le tableau de bord.</p></div>';
+      return;
+    }
+
+    if (flashIndex >= flashQueue.length) {
+      progress.textContent = mastered + " / " + FLASHCARDS.length + " cartes maîtrisées";
+      area.innerHTML = '<div class="empty-state"><div class="big-check">✓</div><p>Série terminée ! Tu as revu toutes les cartes disponibles aujourd\'hui.</p></div>';
+      return;
+    }
+
+    var card = flashQueue[flashIndex];
+    progress.textContent = "Carte " + (flashIndex + 1) + " / " + flashQueue.length + " · " + mastered + " / " + FLASHCARDS.length + " maîtrisées au total";
+
+    area.innerHTML =
+      '<div class="flashcard" id="flip-card">' +
+        '<div class="flashcard-inner">' +
+          '<div class="flash-face flash-front">' + escapeHtml(card.front) + '<div class="flash-hint">(clique pour retourner)</div></div>' +
+          '<div class="flash-face flash-back">' + escapeHtml(card.back) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="eval-buttons" style="margin-top:18px;">' +
+        '<button class="btn-revoir" id="btn-revoir" disabled>À revoir</button>' +
+        '<button class="btn-presque" id="btn-presque" disabled>Presque</button>' +
+        '<button class="btn-sais" id="btn-sais" disabled>Je sais !</button>' +
+      '</div>';
+
+    var flipEl = document.getElementById("flip-card");
+    var flipped = false;
+    flipEl.addEventListener("click", function () {
+      flipped = !flipped;
+      flipEl.classList.toggle("flipped", flipped);
+      if (flipped) {
+        document.getElementById("btn-revoir").disabled = false;
+        document.getElementById("btn-presque").disabled = false;
+        document.getElementById("btn-sais").disabled = false;
+      }
+    });
+
+    document.getElementById("btn-revoir").addEventListener("click", function (e) {
+      e.stopPropagation();
+      answerCard(card, "revoir");
+    });
+    document.getElementById("btn-presque").addEventListener("click", function (e) {
+      e.stopPropagation();
+      answerCard(card, "presque");
+    });
+    document.getElementById("btn-sais").addEventListener("click", function (e) {
+      e.stopPropagation();
+      answerCard(card, "sais");
+    });
+  }
+
+  function answerCard(card, result) {
+    var cs = getCardState(card.id);
+    if (result === "revoir") {
+      cs.level = 0;
+      cs.due = Date.now();
+    } else if (result === "presque") {
+      cs.level = Math.max(1, cs.level);
+      cs.due = Date.now() + LEVEL_INTERVALS_DAYS[1] * DAY_MS;
+    } else {
+      cs.level = Math.min(cs.level + 1, 4);
+      cs.due = Date.now() + LEVEL_INTERVALS_DAYS[cs.level] * DAY_MS;
+    }
+    saveState();
+    flashIndex++;
+    renderCurrentCard();
+  }
+
+  // ---------------------------------------------------------------
+  // QCM
+  // ---------------------------------------------------------------
+  var qcmOrder = [];
+  var qcmIndex = 0;
+  var qcmScore = 0;
+  var qcmAnswered = false;
+  var qcmWrongNotions = [];
+
+  function renderQcmStart() {
+    qcmOrder = QCM.map(function (_, i) { return i; });
+    qcmIndex = 0;
+    qcmScore = 0;
+    qcmWrongNotions = [];
+    qcmAnswered = false;
+    renderQcmQuestion();
+  }
+
+  function renderQcmQuestion() {
+    var area = document.getElementById("qcm-area");
+    if (qcmIndex >= qcmOrder.length) {
+      if (state.qcmBest === null || state.qcmBest === undefined || qcmScore > state.qcmBest) {
+        state.qcmBest = qcmScore;
+        saveState();
+      }
+      var html = '<div class="qcm-result"><div class="score">' + qcmScore + ' / ' + QCM.length + '</div><p>Score obtenu à cette série.</p>';
+      if (qcmWrongNotions.length > 0) {
+        html += '<p><strong>Notions à revoir en priorité :</strong></p><ul>';
+        qcmWrongNotions.forEach(function (n) { html += '<li>' + escapeHtml(n) + '</li>'; });
+        html += '</ul>';
+      } else {
+        html += '<p>Aucune erreur — bravo !</p>';
+      }
+      html += '<button onclick="location.reload()" style="display:none"></button></div>';
+      area.innerHTML = html;
+      var again = document.createElement("div");
+      again.style.textAlign = "center";
+      again.innerHTML = '<button id="qcm-restart" style="background:var(--blue);color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;">Refaire le QCM</button>';
+      area.appendChild(again);
+      document.getElementById("qcm-restart").addEventListener("click", renderQcmStart);
+      renderDashboard();
+      return;
+    }
+
+    var qi = qcmOrder[qcmIndex];
+    var question = QCM[qi];
+    qcmAnswered = false;
+
+    var html = '<div class="qcm-question">' +
+      '<div class="qnum">Question ' + (qcmIndex + 1) + ' / ' + QCM.length + '</div>' +
+      '<h3>' + escapeHtml(question.q) + '</h3>' +
+      '<div class="qcm-options">';
+    question.options.forEach(function (opt, i) {
+      html += '<button class="qcm-option" data-idx="' + i + '">' + escapeHtml(opt) + '</button>';
+    });
+    html += '</div><div class="qcm-explain" id="qcm-explain"></div>' +
+      '<div class="qcm-nav"><span></span><button id="qcm-next" disabled>Suivant</button></div>' +
+      '</div>';
+    area.innerHTML = html;
+
+    var optionButtons = area.querySelectorAll(".qcm-option");
+    optionButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (qcmAnswered) return;
+        qcmAnswered = true;
+        var chosen = parseInt(btn.getAttribute("data-idx"), 10);
+        optionButtons.forEach(function (b, i) {
+          b.disabled = true;
+          if (i === question.correct) b.classList.add("correct");
+          else if (i === chosen) b.classList.add("incorrect");
+        });
+        if (chosen === question.correct) {
+          qcmScore++;
+        } else {
+          qcmWrongNotions.push(question.q);
+        }
+        var explainEl = document.getElementById("qcm-explain");
+        explainEl.style.display = "block";
+        explainEl.textContent = question.explain;
+        document.getElementById("qcm-next").disabled = false;
+      });
+    });
+
+    document.getElementById("qcm-next").addEventListener("click", function () {
+      qcmIndex++;
+      renderQcmQuestion();
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // REDACTION
+  // ---------------------------------------------------------------
+  function renderRedaction() {
+    var area = document.getElementById("redac-area");
+    area.innerHTML = "";
+    REDACTION.forEach(function (item, idx) {
+      var id = "redac-" + idx;
+      var validated = !!(state.redacValidated || {})[id];
+      var block = document.createElement("div");
+      block.className = "redac-block";
+      block.innerHTML =
+        '<h3>' + escapeHtml(item.seance) + (validated ? '<span class="validated-badge">Validé</span>' : '') + '</h3>' +
+        '<p>' + escapeHtml(item.prompt) + '</p>' +
+        '<textarea placeholder="Écris ta réponse ici..." id="ta-' + id + '"></textarea>' +
+        '<div><button class="reveal-btn" id="reveal-' + id + '">Voir les éléments attendus</button></div>' +
+        '<div class="redac-model" id="model-' + id + '">' +
+          '<div class="label">Exemple de réponse :</div>' +
+          '<p>' + escapeHtml(item.model) + '</p>' +
+          '<div class="redac-criteria">' +
+            '<div class="label">Auto-correction — coche ce que tu as fait :</div>' +
+            item.criteres.map(function (c, ci) {
+              return '<label><input type="checkbox" class="crit-' + id + '" data-id="' + id + '"> ' + escapeHtml(c) + '</label>';
+            }).join("") +
+          '</div>' +
+        '</div>';
+      area.appendChild(block);
+
+      block.querySelector("#reveal-" + id).addEventListener("click", function () {
+        var modelEl = block.querySelector("#model-" + id);
+        modelEl.style.display = modelEl.style.display === "block" ? "none" : "block";
+      });
+
+      var checks = block.querySelectorAll(".crit-" + id);
+      checks.forEach(function (chk) {
+        chk.addEventListener("change", function () {
+          var allChecked = Array.prototype.every.call(checks, function (c) { return c.checked; });
+          if (!state.redacValidated) state.redacValidated = {};
+          state.redacValidated[id] = allChecked;
+          saveState();
+          renderDashboard();
+          var badgeParent = block.querySelector("h3");
+          var existingBadge = badgeParent.querySelector(".validated-badge");
+          if (allChecked && !existingBadge) {
+            var badge = document.createElement("span");
+            badge.className = "validated-badge";
+            badge.textContent = "Validé";
+            badgeParent.appendChild(badge);
+          } else if (!allChecked && existingBadge) {
+            existingBadge.remove();
+          }
+        });
+      });
+    });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------------------------------------------------------------
+  // INIT
+  // ---------------------------------------------------------------
+  renderDashboard();
+})();
+</script>
+
+</body>
+</html>
