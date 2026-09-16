@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module de révision — Séquence 2 — De la naissance de l'islam à la prise de Bagdad par les Mongols — 5e</title>
+<style>
+:root {
+  --ink: #1c2733;
+  --ink-soft: #4a5666;
+  --paper: #faf8f4;
+  --paper-raised: #ffffff;
+  --line: #e2ded4;
+  --accent: #1B5FA8;       /* Histoire */
+  --accent-dark: #10314F;
+  --accent-soft: #e8f0f9;
+  --green: #1E8449;
+  --orange: #E07B1D;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(28,39,51,.06), 0 6px 20px rgba(28,39,51,.05);
+  --font: "Lexie Readable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--paper); line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+.module-header { background: var(--accent-dark); color: #fff; padding: 20px 0; }
+.module-header .wrap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.module-header .badge { width: 42px; height: 42px; border-radius: 10px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.15rem; flex: none; }
+.module-header h1 { font-size: 1.1rem; margin: 0; }
+.module-header .sub { font-size: .8rem; opacity: .75; margin: 2px 0 0; }
+.module-header .level-tag { margin-left: auto; background: var(--accent); color: #fff; font-size: .75rem; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+
+.tabs { display: flex; gap: 6px; background: var(--paper-raised); border-bottom: 1px solid var(--line); overflow-x: auto; position: sticky; top: 0; z-index: 10; }
+.tabs .wrap { display: flex; gap: 6px; padding-top: 8px; }
+.tab-btn { border: none; background: transparent; font-family: var(--font); font-size: .9rem; font-weight: 700; color: var(--ink-soft); padding: 12px 16px; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.panel { display: none; padding: 26px 0 60px; }
+.panel.active { display: block; }
+
+/* Dashboard */
+.dash-hero { background: var(--accent-soft); border-radius: var(--radius); padding: 24px; margin-bottom: 22px; }
+.dash-hero .eyebrow { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); }
+.dash-hero h2 { margin: 6px 0 8px; font-size: 1.35rem; }
+.dash-hero p { margin: 0; color: var(--ink-soft); max-width: 62ch; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+@media (max-width: 700px) { .stat-grid { grid-template-columns: 1fr; } }
+.stat-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.stat-card .label { font-size: .78rem; color: var(--ink-soft); font-weight: 700; margin-bottom: 8px; }
+.stat-card .value { font-size: 1.1rem; font-weight: 700; }
+.bar { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+.bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .3s ease; }
+
+.calendar-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 22px; }
+.calendar-card h3 { margin: 0 0 6px; font-size: .95rem; }
+.calendar-card p.desc { margin: 0 0 16px; font-size: .85rem; color: var(--ink-soft); }
+.calendar-steps { display: flex; gap: 8px; flex-wrap: wrap; }
+.calendar-step { flex: 1; min-width: 90px; background: var(--accent-soft); border-radius: 10px; padding: 10px 8px; text-align: center; }
+.calendar-step .tag { font-weight: 700; font-size: .82rem; color: var(--accent-dark); }
+.calendar-step .date { font-size: .72rem; color: var(--ink-soft); margin-top: 2px; }
+
+.reset-row { text-align: right; }
+.reset-btn { font-family: var(--font); font-size: .8rem; font-weight: 700; color: #a34a2b; background: none; border: 1px solid #e0b294; border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+.reset-btn:hover { background: #fbe9e4; }
+
+/* Flashcards */
+.flash-wrap { max-width: 480px; margin: 0 auto; }
+.flash-meta { display: flex; justify-content: space-between; font-size: .8rem; color: var(--ink-soft); margin-bottom: 10px; font-weight: 700; }
+.flash-card { perspective: 1200px; height: 300px; cursor: pointer; }
+.flash-inner { position: relative; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
+.flash-inner.flipped { transform: rotateY(180deg); }
+.flash-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.flash-front { background: var(--accent-soft); }
+.flash-front .theme { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); margin-bottom: 10px; }
+.flash-front .q { font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+.flash-back { background: var(--accent-dark); color: #fff; transform: rotateY(180deg); }
+.flash-back .a { font-size: 1rem; }
+.flash-hint { font-size: .75rem; opacity: .65; margin-top: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+
+.flash-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 18px 0; }
+.flash-actions button { font-family: var(--font); font-weight: 700; font-size: .84rem; padding: 13px 6px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer; background: var(--paper-raised); }
+.btn-revoir { color: #a34a2b; border-color: #e0b294; }
+.btn-presque { color: var(--orange); border-color: #f0c894; }
+.btn-sais { color: var(--green); border-color: #9bcbab; }
+
+.flash-nav { display: flex; justify-content: space-between; align-items: center; }
+.flash-nav button { font-family: var(--font); font-weight: 700; font-size: .85rem; background: none; border: none; color: var(--ink-soft); cursor: pointer; padding: 8px 10px; }
+.flash-status { font-size: .72rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .03em; }
+.flash-status.due { background: #fbe9e4; color: #a34a2b; }
+
+/* QCM */
+.qcm-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+.qcm-theme { font-size: .78rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+.qcm-q { font-size: 1.1rem; font-weight: 700; margin: 0 0 18px; }
+.qcm-options { display: grid; gap: 10px; }
+.qcm-opt { text-align: left; font-family: var(--font); font-size: .92rem; padding: 13px 16px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--paper); cursor: pointer; }
+.qcm-opt:hover { border-color: var(--accent); }
+.qcm-opt.correct { border-color: var(--green); background: #e7f3ec; font-weight: 700; }
+.qcm-opt.wrong { border-color: #c0503a; background: #fbe9e4; font-weight: 700; }
+.qcm-opt[disabled] { cursor: default; }
+.qcm-explain { display: none; margin-top: 16px; background: var(--accent-soft); border-radius: 10px; padding: 14px 16px; font-size: .88rem; color: var(--ink); }
+.qcm-explain.show { display: block; }
+.qcm-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+.qcm-footer button { font-family: var(--font); font-weight: 700; font-size: .88rem; padding: 12px 18px; border-radius: 10px; border: none; cursor: pointer; background: var(--accent-dark); color: #fff; }
+.qcm-footer button:disabled { background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+.qcm-footer .ghost { background: none; color: var(--ink-soft); }
+.qcm-result { text-align: center; padding: 36px 20px; }
+.qcm-result .score { font-size: 2.2rem; font-weight: 700; color: var(--accent); margin: 10px 0; }
+.priority-list { text-align: left; max-width: 480px; margin: 18px auto 0; background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; }
+.priority-list h4 { margin: 0 0 8px; font-size: .85rem; }
+.priority-list ul { margin: 0; padding-left: 18px; font-size: .85rem; color: var(--ink-soft); }
+
+/* Redaction */
+.redac-select { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.redac-select button { font-family: var(--font); font-size: .78rem; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--paper-raised); cursor: pointer; color: var(--ink-soft); }
+.redac-select button.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.redac-select button.validated::after { content: " ✓"; color: var(--green); }
+.redac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+@media (max-width: 800px) { .redac-grid { grid-template-columns: 1fr; } }
+.subject-card { background: var(--accent-dark); color: #fff; border-radius: var(--radius); padding: 22px; }
+.subject-card .tag { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: rgba(255,255,255,.14); padding: 4px 10px; border-radius: 999px; }
+.subject-card p.subject { font-style: normal; font-weight: 700; font-size: 1.02rem; margin: 14px 0 10px; }
+.subject-card p.consigne { font-size: .85rem; opacity: .85; margin: 0; }
+.reveal-btn { margin-top: 14px; font-family: var(--font); font-weight: 700; font-size: .85rem; padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff; cursor: pointer; }
+.expected { display: none; margin-top: 14px; background: rgba(255,255,255,.1); border-radius: 10px; padding: 14px 16px; font-size: .85rem; }
+.expected.show { display: block; }
+
+.checklist { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-top: 16px; }
+.checklist h3 { font-size: .95rem; margin: 0 0 12px; }
+.checklist label { display: flex; gap: 10px; align-items: flex-start; font-size: .85rem; color: var(--ink-soft); margin-bottom: 10px; cursor: pointer; }
+.checklist input { margin-top: 3px; }
+
+textarea.essay { width: 100%; min-height: 220px; font-family: var(--font); font-size: .92rem; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; resize: vertical; background: var(--paper-raised); color: var(--ink); }
+.essay-meta { display: flex; justify-content: space-between; font-size: .78rem; color: var(--ink-soft); margin-top: 8px; }
+
+.filigrane-top { text-align: right; font-size: .68rem; font-style: italic; color: #b3b3b3; padding: 5px 20px; background: var(--paper); }
+</style>
+</head>
+<body>
+
+<div class="filigrane-top">Séq. 2 : De la naissance de l'islam à la prise de Bagdad par les Mongols  ·  Module de révision</div>
+<header class="module-header">
+  <div class="wrap">
+    <span class="badge">H</span>
+    <div>
+      <h1>De la naissance de l'islam à la prise de Bagdad par les Mongols</h1>
+      <p class="sub">Module de révision interactif — Séquence 2 · Histoire · 5e</p>
+    </div>
+    <span class="level-tag">5e</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button class="tab-btn active" data-tab="dashboard">Tableau de bord</button>
+    <button class="tab-btn" data-tab="flashcards">Flashcards</button>
+    <button class="tab-btn" data-tab="qcm">QCM</button>
+    <button class="tab-btn" data-tab="redac">Entraînement rédaction</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- TABLEAU DE BORD -->
+  <section class="panel active" id="panel-dashboard">
+    <div class="dash-hero">
+      <div class="eyebrow">Rappel actif</div>
+      <h2>Prêt·e à réviser cette séquence ?</h2>
+      <p>Ce module reprend les notions clés de la naissance de l'islam à la prise de Bagdad par les Mongols à travers des flashcards, un QCM et un entraînement à la rédaction. Ta progression est enregistrée sur cet appareil.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Flashcards maîtrisées</div>
+        <div class="value" id="dash-flash-text">0 / 20</div>
+        <div class="bar"><span id="dash-flash-bar" style="width:0%"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Meilleur score QCM</div>
+        <div class="value" id="dash-qcm-text">Non tenté</div>
+        <div class="bar"><span id="dash-qcm-bar" style="width:0%"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Questions de rédaction validées</div>
+        <div class="value" id="dash-redac-text">0 / 6</div>
+        <div class="bar"><span id="dash-redac-bar" style="width:0%"></span></div>
+      </div>
+    </div>
+    <div class="calendar-card">
+      <h3>La répétition espacée : la méthode la plus efficace pour mémoriser</h3>
+      <p class="desc">Reviens sur les flashcards que tu ne maîtrises pas encore aux intervalles suivants. Le module se souvient pour toi de ce qui est dû aujourd'hui.</p>
+      <div class="calendar-steps" id="calendar-steps"></div>
+    </div>
+    <div class="reset-row">
+      <button class="reset-btn" id="reset-btn">Réinitialiser ma progression</button>
+    </div>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section class="panel" id="panel-flashcards">
+    <div class="flash-wrap">
+      <div class="flash-meta">
+        <span id="flash-count">Carte 1 / 20</span>
+        <span id="flash-status" class="flash-status">À revoir aujourd'hui</span>
+      </div>
+      <div class="flash-card" id="flash-card">
+        <div class="flash-inner" id="flash-inner">
+          <div class="flash-face flash-front">
+            <div class="theme" id="flash-theme">Thème</div>
+            <p class="q" id="flash-q">Question</p>
+            <p class="flash-hint">Clique pour retourner</p>
+          </div>
+          <div class="flash-face flash-back">
+            <p class="a" id="flash-a">Réponse</p>
+            <p class="flash-hint">Clique pour revenir</p>
+          </div>
+        </div>
+      </div>
+      <div class="flash-actions">
+        <button class="btn-revoir" id="btn-revoir">À revoir</button>
+        <button class="btn-presque" id="btn-presque">Presque</button>
+        <button class="btn-sais" id="btn-sais">Je sais !</button>
+      </div>
+      <div class="flash-nav">
+        <button id="flash-prev">‹ Précédente</button>
+        <span style="font-size:.75rem;opacity:.6;">clique la carte pour voir la réponse</span>
+        <button id="flash-next">Suivante ›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QCM -->
+  <section class="panel" id="panel-qcm">
+    <div id="qcm-active">
+      <div class="qcm-card">
+        <div class="qcm-theme" id="qcm-theme">Thème</div>
+        <div class="bar" style="margin-bottom:16px;"><span id="qcm-progress" style="width:0%"></span></div>
+        <p class="qcm-q" id="qcm-q">Question</p>
+        <div class="qcm-options" id="qcm-options"></div>
+        <div class="qcm-explain" id="qcm-explain"></div>
+        <div class="qcm-footer">
+          <button class="ghost" id="qcm-prev">‹ Précédente</button>
+          <button id="qcm-next" disabled>Suivante ›</button>
+        </div>
+      </div>
+    </div>
+    <div id="qcm-result" style="display:none;">
+      <div class="qcm-card qcm-result">
+        <div class="eyebrow" style="color:var(--accent);font-weight:700;font-size:.8rem;text-transform:uppercase;">QCM terminé</div>
+        <div class="score" id="qcm-final-score">0 / 20</div>
+        <p id="qcm-final-msg" style="color:var(--ink-soft);"></p>
+        <div class="priority-list" id="qcm-priority" style="display:none;">
+          <h4>Notions à revoir en priorité</h4>
+          <ul id="qcm-priority-list"></ul>
+        </div>
+        <button id="qcm-restart" style="font-family:var(--font);font-weight:700;padding:12px 20px;border-radius:10px;border:none;background:var(--accent-dark);color:#fff;cursor:pointer;margin-top:16px;">Recommencer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REDACTION -->
+  <section class="panel" id="panel-redac">
+    <div class="redac-select" id="redac-select"></div>
+    <div class="redac-grid">
+      <div>
+        <div class="subject-card">
+          <span class="tag" id="redac-tag">Séance 1</span>
+          <p class="subject" id="redac-subject">Sujet</p>
+          <p class="consigne" id="redac-consigne">Consigne</p>
+          <button class="reveal-btn" id="reveal-btn">Voir les éléments attendus</button>
+          <div class="expected" id="redac-expected"></div>
+        </div>
+        <div class="checklist">
+          <h3>Grille d'auto-évaluation</h3>
+          <div id="redac-checklist"></div>
+        </div>
+      </div>
+      <div>
+        <textarea class="essay" id="essay" placeholder="Rédige ta réponse ici..."></textarea>
+        <div class="essay-meta">
+          <span id="essay-count">0 mot</span>
+          <span id="essay-saved" style="opacity:.6;">Non enregistré</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'hg5e-seq2-islam-bagdad';
+  const DAY = 24 * 60 * 60 * 1000;
+  const LEVEL_INTERVALS = [1, 3, 7, 14]; // jours conseillés pour les niveaux 1 à 4
+
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+  function addDaysISO(days) { return new Date(Date.now() + days * DAY).toISOString().slice(0, 10); }
+  function fmtDate(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+
+  // ---------- Contenu : 20 flashcards / 20 QCM (une question par flashcard) ----------
+  const flashcards = [
+    { theme: 'S1 — Naissance de l\'islam', q: "Qu'est-ce que l'Hégire ?", a: "Le départ de Muhammad de La Mecque pour Médine en 622 ; c'est le point de départ du calendrier musulman." },
+    { theme: 'S1 — Naissance de l\'islam', q: "En quel siècle et dans quelle région naît l'islam ?", a: "Au VIIe siècle, en Arabie." },
+    { theme: 'S1 — Naissance de l\'islam', q: "Qui est Muhammad ?", a: "Le prophète de l'islam, né à La Mecque, mort en 632." },
+    { theme: 'S1 — Naissance de l\'islam', q: "Pourquoi distingue-t-on une source contemporaine d'une source postérieure sur les débuts de l'islam ?", a: "Parce que les récits religieux détaillés (comme la Vie du prophète, IXe siècle) sont écrits près de deux siècles après les faits du VIIe siècle." },
+    { theme: 'S2 — Empire omeyyade', q: "Qu'est-ce qu'un calife ?", a: "Le successeur du prophète, chef politique et religieux de la communauté musulmane." },
+    { theme: 'S2 — Empire omeyyade', q: "Quelles dates encadrent la dynastie omeyyade ?", a: "661 à 750, avec Damas pour capitale." },
+    { theme: 'S2 — Empire omeyyade', q: "Qu'a changé la réforme monétaire d'Abd al-Malik ?", a: "Les monnaies deviennent purement épigraphiques et islamiques : plus aucune image, seulement des inscriptions religieuses." },
+    { theme: 'S2 — Empire omeyyade', q: "Que signifient arabisation et islamisation ?", a: "La politique d'unification de l'empire par la diffusion de la langue arabe et de la religion musulmane." },
+    { theme: 'S3 — Apogée abbasside', q: "Quand et où est fondée Bagdad ?", a: "En 762, elle devient la capitale de l'empire abbasside." },
+    { theme: 'S3 — Apogée abbasside', q: "Qui est Haroun al-Rachid ?", a: "Calife abbasside (786-809), figure de l'apogée de Bagdad, personnage des Mille et Une Nuits." },
+    { theme: 'S3 — Apogée abbasside', q: "Qu'est-ce qu'un dhimmi ?", a: "Le statut protégé des non-musulmans (juifs, chrétiens) dans l'empire, en échange d'un impôt spécifique." },
+    { theme: 'S3 — Apogée abbasside', q: "Jusqu'à quand la population de l'empire n'est-elle pas majoritairement musulmane ?", a: "Jusqu'au XIIe siècle : l'empire reste marqué par une grande diversité religieuse." },
+    { theme: 'S4 — Morcellement', q: "Qu'est-ce que le morcellement du califat ?", a: "La fragmentation progressive du pouvoir califal en plusieurs pouvoirs concurrents à partir du Xe siècle." },
+    { theme: 'S4 — Morcellement', q: "D'où vient la division entre sunnites et chiites ?", a: "D'un désaccord sur la succession de Muhammad, dès sa mort en 632." },
+    { theme: 'S4 — Morcellement', q: "Qui sont les Fatimides ?", a: "Une dynastie chiite qui fonde Le Caire en 969 et installe un califat rival de celui de Bagdad." },
+    { theme: 'S4 — Morcellement', q: "Que s'est-il passé en 1258 ?", a: "La prise de Bagdad par les Mongols : le dernier calife abbasside disparaît, c'est la fin de l'empire arabo-persan." },
+    { theme: 'S5 — Contacts en Méditerranée', q: "Pourquoi Charlemagne et Haroun al-Rachid échangent-ils des ambassades ?", a: "Pour rendre hommage l'un à l'autre et rechercher une alliance : ils ont un ennemi commun, les Omeyyades de Cordoue." },
+    { theme: 'S5 — Contacts en Méditerranée', q: "Pourquoi Al-Andalus est-elle importante pour l'histoire des sciences ?", a: "C'est un foyer majeur de transmission des savoirs antiques (mathématiques, astronomie, médecine) vers l'Occident latin, via des traducteurs comme Gérard de Crémone à Tolède." },
+    { theme: 'S5 — Contacts en Méditerranée', q: "Qu'est-ce que la Reconquista ?", a: "La reconquête progressive de la péninsule Ibérique par les royaumes chrétiens, entre l'an 1000 et 1212." },
+    { theme: 'S5 — Contacts en Méditerranée', q: "Qu'est-ce qu'une croisade ?", a: "Une expédition militaire chrétienne vers l'Orient, appelée par le pape à partir de 1095 (appel d'Urbain II)." },
+  ];
+
+  const qcm = [
+    { theme: 'S1', q: "Que désigne l'Hégire ?", options: ["La naissance de Muhammad", "Le départ de Muhammad de La Mecque pour Médine (622)", "La mort de Muhammad", "La fondation de Bagdad"], correct: 1, explain: "L'Hégire, en 622, marque le début du calendrier musulman." },
+    { theme: 'S1', q: "En quel siècle naît l'islam ?", options: ["Ve siècle", "VIe siècle", "VIIe siècle", "VIIIe siècle"], correct: 2, explain: "L'islam naît au VIIe siècle, en Arabie." },
+    { theme: 'S1', q: "Qui est Muhammad ?", options: ["Un calife omeyyade", "Le prophète de l'islam", "Un empereur byzantin", "Un traducteur de Tolède"], correct: 1, explain: "Muhammad est le prophète fondateur de l'islam, mort en 632." },
+    { theme: 'S1', q: "Pourquoi la Vie du prophète (IXe s.) n'est-elle pas une source directe des faits du VIIe siècle ?", options: ["Elle est écrite en latin", "Elle est écrite près de deux siècles après les faits", "Elle ne parle pas de Muhammad", "Elle est plus ancienne que la monnaie de 686"], correct: 1, explain: "Ce texte religieux construit le récit des origines environ deux siècles après les événements." },
+    { theme: 'S2', q: "Qu'est-ce qu'un calife ?", options: ["Un gouverneur byzantin", "Le successeur du prophète, chef politique et religieux", "Un savant traducteur", "Un chef militaire mongol"], correct: 1, explain: "Le calife est le successeur du prophète à la tête de la communauté musulmane." },
+    { theme: 'S2', q: "Quelle dynastie règne de 661 à 750 ?", options: ["Les Abbassides", "Les Fatimides", "Les Omeyyades", "Les Mongols"], correct: 2, explain: "Les Omeyyades règnent depuis Damas de 661 à 750." },
+    { theme: 'S2', q: "Que change la réforme monétaire d'Abd al-Malik ?", options: ["Elle ajoute des portraits de calife", "Elle supprime les images au profit d'inscriptions religieuses", "Elle instaure le papier-monnaie", "Elle adopte la monnaie byzantine"], correct: 1, explain: "Les monnaies deviennent purement épigraphiques, affirmant une identité islamique propre." },
+    { theme: 'S2', q: "Que signifie « islamisation » de l'empire omeyyade ?", options: ["La conversion forcée de tous les habitants", "La diffusion de la religion musulmane dans l'administration et la société", "L'interdiction du christianisme", "La construction d'églises"], correct: 1, explain: "L'islamisation accompagne l'arabisation dans la politique d'unification de l'empire." },
+    { theme: 'S3', q: "En quelle année Bagdad est-elle fondée ?", options: ["622", "750", "762", "969"], correct: 2, explain: "Bagdad est fondée en 762 et devient la capitale abbasside." },
+    { theme: 'S3', q: "Qui est Haroun al-Rachid ?", options: ["Un calife omeyyade", "Un calife abbasside (786-809)", "Un pape", "Un roi wisigoth"], correct: 1, explain: "Haroun al-Rachid incarne l'apogée de Bagdad sous les Abbassides." },
+    { theme: 'S3', q: "Qu'est-ce qu'un dhimmi ?", options: ["Un musulman converti", "Un non-musulman protégé, soumis à un impôt spécifique", "Un calife régional", "Un croisé"], correct: 1, explain: "Le statut de dhimmi protège juifs et chrétiens dans l'empire musulman." },
+    { theme: 'S3', q: "Jusqu'à quand la population de l'empire n'est-elle pas majoritairement musulmane ?", options: ["Le VIIIe siècle", "Le Xe siècle", "Le XIIe siècle", "Le XIVe siècle"], correct: 2, explain: "La conversion majoritaire à l'islam n'intervient qu'à partir du XIIe siècle." },
+    { theme: 'S4', q: "Qu'est-ce que le morcellement du califat ?", options: ["Son extension territoriale", "Sa fragmentation en pouvoirs concurrents", "Sa conversion au christianisme", "Son alliance avec Byzance"], correct: 1, explain: "À partir du Xe siècle, plusieurs califats rivaux coexistent." },
+    { theme: 'S4', q: "D'où vient la division entre sunnites et chiites ?", options: ["D'un désaccord sur la succession de Muhammad", "D'une guerre avec Byzance", "D'une réforme monétaire", "D'un désaccord sur le calendrier"], correct: 0, explain: "Ce désaccord, dès la mort de Muhammad en 632, fonde la division." },
+    { theme: 'S4', q: "Qui fonde Le Caire en 969 ?", options: ["Les Omeyyades", "Les Abbassides", "Les Fatimides", "Les Mongols"], correct: 2, explain: "Les Fatimides, chiites, fondent Le Caire comme capitale rivale de Bagdad." },
+    { theme: 'S4', q: "Que se passe-t-il en 1258 ?", options: ["La fondation de Bagdad", "L'Hégire", "La prise de Bagdad par les Mongols", "Le début des croisades"], correct: 2, explain: "En 1258, la prise de Bagdad par les Mongols met fin au califat abbasside." },
+    { theme: 'S5', q: "Pourquoi Charlemagne et Haroun al-Rachid échangent-ils des ambassades ?", options: ["Ils sont cousins", "Ils ont un ennemi commun, les Omeyyades de Cordoue", "Ils préparent une croisade ensemble", "Ils partagent la même religion"], correct: 1, explain: "Cette alliance diplomatique s'explique par un adversaire commun." },
+    { theme: 'S5', q: "Quel rôle joue Al-Andalus dans l'histoire des sciences ?", options: ["Elle isole l'Europe du monde arabe", "Elle transmet les savoirs antiques vers l'Occident latin", "Elle interdit les traductions", "Elle est coupée du monde musulman"], correct: 1, explain: "Des traducteurs comme Gérard de Crémone travaillent à Tolède, en Al-Andalus." },
+    { theme: 'S5', q: "Qu'est-ce que la Reconquista ?", options: ["La conquête arabe de l'Espagne", "La reconquête chrétienne de la péninsule Ibérique", "La prise de Bagdad", "Une croisade en Orient"], correct: 1, explain: "La Reconquista s'étend de l'an 1000 à 1212 environ." },
+    { theme: 'S5', q: "Qui appelle à la première croisade, en 1095 ?", options: ["Le calife de Bagdad", "L'empereur byzantin", "Le pape Urbain II", "Charlemagne"], correct: 2, explain: "Urbain II lance l'appel à la croisade en 1095." },
+  ];
+
+  // ---------- Contenu : questions de rédaction (une par séance, S1 à S6) ----------
+  const redacQuestions = [
+    {
+      tag: 'Séance 1', subject: "En 2 à 3 phrases, explique qui, où, quand et comment naît l'islam, et par quels types de sources nous le savons.",
+      consigne: "Utilise le vocabulaire : Hégire, monothéisme, prophète.",
+      expected: "L'islam naît au VIIe siècle en Arabie, autour du prophète Muhammad. Nous le savons grâce à des sources contemporaines (monnaies, graffitis) et à des récits religieux rédigés plus tard, au IXe siècle (Vie du prophète).",
+      criteria: ["J'ai situé l'islam dans le temps (VIIe siècle) et dans l'espace (Arabie)", "J'ai cité le nom du prophète Muhammad", "J'ai distingué un type de source contemporaine et un type de source postérieure"],
+    },
+    {
+      tag: 'Séance 2', subject: "En 2 à 3 phrases, explique comment les Omeyyades construisent un vaste empire arabe et islamique.",
+      consigne: "Utilise le vocabulaire : calife, empire, arabisation, islamisation.",
+      expected: "Les Omeyyades, califes de 661 à 750, étendent un empire immense depuis Damas. Le calife Abd al-Malik unifie cet empire par l'arabisation et l'islamisation, notamment en réformant les monnaies pour qu'elles deviennent purement islamiques.",
+      criteria: ["J'ai cité la dynastie omeyyade et ses dates (661-750)", "J'ai expliqué ce que signifient arabisation et islamisation", "J'ai donné un exemple concret (réforme monétaire ou mosquée de Damas)"],
+    },
+    {
+      tag: 'Séance 3', subject: "En 2 à 3 phrases, explique en quoi l'empire abbasside est une civilisation marquée par la diversité.",
+      consigne: "Utilise le vocabulaire : dhimmi, diversité culturelle, commandeur des croyants.",
+      expected: "Sous les Abbassides, Bagdad devient le centre d'un empire cosmopolite, marqué par une grande diversité religieuse, linguistique et artistique. Les non-musulmans (dhimmis) y sont protégés, et la population reste majoritairement non musulmane jusqu'au XIIe siècle.",
+      criteria: ["J'ai cité Bagdad et son rôle de capitale abbasside", "J'ai expliqué le statut de dhimmi", "J'ai mentionné au moins un aspect de la diversité (religieuse, culturelle ou linguistique)"],
+    },
+    {
+      tag: 'Séance 4', subject: "En 2 à 3 phrases, explique pourquoi le califat perd son unité et ce qui se passe en 1258.",
+      consigne: "Utilise le vocabulaire : morcellement, sunnites, chiites, califat fatimide.",
+      expected: "Dès le Xe siècle, le califat abbasside se fragmente : des pouvoirs régionaux et des califats rivaux apparaissent, comme celui des Fatimides chiites au Caire. En 1258, la prise de Bagdad par les Mongols met fin au califat abbasside.",
+      criteria: ["J'ai expliqué la notion de morcellement", "J'ai mentionné la division sunnites/chiites ou les Fatimides", "J'ai cité la date de 1258 et son événement"],
+    },
+    {
+      tag: 'Séance 5', subject: "En 2 à 3 phrases : les contacts entre chrétientés et islam sont-ils uniquement guerriers ? Donne un exemple pacifique et un exemple conflictuel.",
+      consigne: "Utilise le vocabulaire : ambassade, Al-Andalus, Reconquista, croisade.",
+      expected: "Non, les contacts entre chrétientés et islam sont à la fois pacifiques et conflictuels. Par exemple, les ambassades entre Charlemagne et Haroun al-Rachid ou la transmission des savoirs à Al-Andalus sont pacifiques, tandis que la Reconquista ou les croisades sont des affrontements.",
+      criteria: ["J'ai répondu clairement à la question (non, ce n'est pas uniquement guerrier)", "J'ai donné un exemple pacifique précis", "J'ai donné un exemple conflictuel précis"],
+    },
+    {
+      tag: 'Séance 6', subject: "En quelques phrases, résume la séquence : comment l'empire arabo-musulman s'est-il constitué, organisé puis fragmenté, et quelles relations a-t-il entretenues avec les chrétientés ?",
+      consigne: "C'est un bilan : reprends les grandes étapes vues depuis la séance 1.",
+      expected: "Né en Arabie au VIIe siècle, l'islam donne naissance à un empire qui s'étend rapidement sous les Omeyyades, puis connaît son apogée sous les Abbassides à Bagdad, avant de se fragmenter à partir du Xe siècle jusqu'à la prise de Bagdad par les Mongols en 1258. Tout au long de cette période, cet empire entretient avec les chrétientés des relations à la fois pacifiques (diplomatie, savoirs) et conflictuelles (Reconquista, croisades).",
+      criteria: ["J'ai retracé les grandes étapes chronologiques (Omeyyades, Abbassides, morcellement)", "J'ai mentionné 1258 et la prise de Bagdad", "J'ai évoqué les deux types de relations avec les chrétientés"],
+    },
+  ];
+
+  // ---------- État persistant ----------
+  let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  state.cards = state.cards || flashcards.map(() => ({ level: 0, nextReview: todayISO() }));
+  if (state.cards.length !== flashcards.length) {
+    // sécurité si le contenu a changé entre deux versions du module
+    while (state.cards.length < flashcards.length) state.cards.push({ level: 0, nextReview: todayISO() });
+    state.cards = state.cards.slice(0, flashcards.length);
+  }
+  state.qcmBest = state.qcmBest || 0;
+  state.redac = state.redac || redacQuestions.map(() => ({ text: '', checklist: [] }));
+
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  // ---------- Onglets ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'dashboard') updateDashboard();
+    });
+  });
+
+  // ---------- Flashcards (répétition espacée à 4 niveaux) ----------
+  let fIndex = 0, fFlipped = false;
+  const flashInner = document.getElementById('flash-inner');
+
+  function renderFlash() {
+    const c = flashcards[fIndex];
+    const cardState = state.cards[fIndex];
+    fFlipped = false;
+    flashInner.classList.remove('flipped');
+    document.getElementById('flash-theme').textContent = c.theme;
+    document.getElementById('flash-q').textContent = c.q;
+    document.getElementById('flash-a').textContent = c.a;
+    document.getElementById('flash-count').textContent = `Carte ${fIndex + 1} / ${flashcards.length}`;
+    const statusEl = document.getElementById('flash-status');
+    const due = cardState.nextReview <= todayISO();
+    if (due) {
+      statusEl.textContent = 'À revoir aujourd\'hui';
+      statusEl.classList.add('due');
+    } else {
+      statusEl.textContent = 'Prochaine révision : ' + fmtDate(cardState.nextReview);
+      statusEl.classList.remove('due');
+    }
+  }
+  document.getElementById('flash-card').addEventListener('click', () => {
+    fFlipped = !fFlipped;
+    flashInner.classList.toggle('flipped', fFlipped);
+  });
+  document.getElementById('flash-next').addEventListener('click', () => { fIndex = (fIndex + 1) % flashcards.length; renderFlash(); });
+  document.getElementById('flash-prev').addEventListener('click', () => { fIndex = (fIndex - 1 + flashcards.length) % flashcards.length; renderFlash(); });
+
+  function gradeCard(grade) {
+    const c = state.cards[fIndex];
+    if (grade === 'revoir') {
+      c.level = 0;
+      c.nextReview = todayISO();
+    } else if (grade === 'presque') {
+      c.nextReview = addDaysISO(1);
+    } else if (grade === 'sais') {
+      c.nextReview = addDaysISO(LEVEL_INTERVALS[c.level]);
+      c.level = Math.min(c.level + 1, LEVEL_INTERVALS.length - 1);
+    }
+    save();
+    setTimeout(() => { fIndex = (fIndex + 1) % flashcards.length; renderFlash(); updateDashboard(); }, 180);
+  }
+  document.getElementById('btn-revoir').addEventListener('click', () => gradeCard('revoir'));
+  document.getElementById('btn-presque').addEventListener('click', () => gradeCard('presque'));
+  document.getElementById('btn-sais').addEventListener('click', () => gradeCard('sais'));
+
+  // ---------- QCM ----------
+  let qIndex = 0, qAnswers = [];
+  function renderQcm() {
+    if (qIndex >= qcm.length) { renderQcmResult(); return; }
+    document.getElementById('qcm-active').style.display = 'block';
+    document.getElementById('qcm-result').style.display = 'none';
+    const q = qcm[qIndex];
+    document.getElementById('qcm-theme').textContent = q.theme;
+    document.getElementById('qcm-q').textContent = q.q;
+    document.getElementById('qcm-progress').style.width = Math.round((qIndex / qcm.length) * 100) + '%';
+    const optsEl = document.getElementById('qcm-options');
+    optsEl.innerHTML = '';
+    const already = qAnswers[qIndex];
+    q.options.forEach((opt, i) => {
+      const b = document.createElement('button');
+      b.className = 'qcm-opt';
+      b.textContent = opt;
+      if (already !== undefined) {
+        b.disabled = true;
+        if (i === q.correct) b.classList.add('correct');
+        else if (i === already) b.classList.add('wrong');
+      } else {
+        b.addEventListener('click', () => { qAnswers[qIndex] = i; renderQcm(); });
+      }
+      optsEl.appendChild(b);
+    });
+    const explainEl = document.getElementById('qcm-explain');
+    if (already !== undefined) {
+      explainEl.textContent = q.explain;
+      explainEl.classList.add('show');
+    } else {
+      explainEl.classList.remove('show');
+    }
+    document.getElementById('qcm-prev').style.visibility = qIndex === 0 ? 'hidden' : 'visible';
+    document.getElementById('qcm-next').disabled = already === undefined;
+  }
+  document.getElementById('qcm-next').addEventListener('click', () => { qIndex++; renderQcm(); });
+  document.getElementById('qcm-prev').addEventListener('click', () => { if (qIndex > 0) { qIndex--; renderQcm(); } });
+
+  function renderQcmResult() {
+    document.getElementById('qcm-active').style.display = 'none';
+    document.getElementById('qcm-result').style.display = 'block';
+    const score = qAnswers.filter((a, i) => a === qcm[i].correct).length;
+    if (score > state.qcmBest) { state.qcmBest = score; save(); }
+    document.getElementById('qcm-final-score').textContent = `${score} / ${qcm.length}`;
+    const pct = Math.round((score / qcm.length) * 100);
+    const msg = pct >= 80 ? "Très solide ! Ces notions sont acquises." : pct >= 50 ? "Pas mal, repasse par les flashcards sur les questions ratées." : "Retourne d'abord voir les flashcards avant de retenter le QCM.";
+    document.getElementById('qcm-final-msg').textContent = msg;
+    const wrong = qAnswers.map((a, i) => (a !== qcm[i].correct ? i : -1)).filter(i => i >= 0);
+    const priorityEl = document.getElementById('qcm-priority');
+    const listEl = document.getElementById('qcm-priority-list');
+    if (wrong.length > 0) {
+      priorityEl.style.display = 'block';
+      listEl.innerHTML = '';
+      wrong.forEach(i => {
+        const li = document.createElement('li');
+        li.textContent = flashcards[i].theme + ' — ' + flashcards[i].q;
+        listEl.appendChild(li);
+      });
+    } else {
+      priorityEl.style.display = 'none';
+    }
+    updateDashboard();
+  }
+  document.getElementById('qcm-restart').addEventListener('click', () => { qIndex = 0; qAnswers = []; renderQcm(); });
+
+  // ---------- Rédaction ----------
+  let rIndex = 0;
+  const redacSelectEl = document.getElementById('redac-select');
+  redacQuestions.forEach((rq, i) => {
+    const b = document.createElement('button');
+    b.textContent = rq.tag;
+    b.addEventListener('click', () => { saveCurrentEssay(); rIndex = i; renderRedac(); });
+    redacSelectEl.appendChild(b);
+  });
+
+  function saveCurrentEssay() {
+    state.redac[rIndex].text = document.getElementById('essay').value;
+    save();
+  }
+
+  function isValidated(i) {
+    const r = state.redac[i];
+    return r.checklist.filter(Boolean).length === redacQuestions[i].criteria.length && redacQuestions[i].criteria.length > 0;
+  }
+
+  function renderRedac() {
+    const rq = redacQuestions[rIndex];
+    const rState = state.redac[rIndex];
+    document.querySelectorAll('.redac-select button').forEach((b, i) => {
+      b.classList.toggle('active', i === rIndex);
+      b.classList.toggle('validated', isValidated(i));
+    });
+    document.getElementById('redac-tag').textContent = rq.tag;
+    document.getElementById('redac-subject').textContent = rq.subject;
+    document.getElementById('redac-consigne').textContent = rq.consigne;
+    document.getElementById('redac-expected').textContent = rq.expected;
+    document.getElementById('redac-expected').classList.remove('show');
+
+    const checklistEl = document.getElementById('redac-checklist');
+    checklistEl.innerHTML = '';
+    rq.criteria.forEach((crit, i) => {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = !!rState.checklist[i];
+      input.addEventListener('change', () => {
+        rState.checklist[i] = input.checked;
+        save();
+        renderRedac();
+        updateDashboard();
+      });
+      const span = document.createElement('span');
+      span.textContent = crit;
+      label.appendChild(input);
+      label.appendChild(span);
+      checklistEl.appendChild(label);
+    });
+
+    const essayEl = document.getElementById('essay');
+    essayEl.value = rState.text;
+    updateEssayMeta();
+  }
+
+  document.getElementById('reveal-btn').addEventListener('click', () => {
+    document.getElementById('redac-expected').classList.toggle('show');
+  });
+
+  function updateEssayMeta() {
+    const essayEl = document.getElementById('essay');
+    const words = essayEl.value.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('essay-count').textContent = `${words} mot${words > 1 ? 's' : ''}`;
+    document.getElementById('essay-saved').textContent = essayEl.value ? 'Enregistré sur cet appareil' : 'Non enregistré';
+  }
+  document.getElementById('essay').addEventListener('input', () => {
+    saveCurrentEssay();
+    updateEssayMeta();
+    updateDashboard();
+  });
+
+  // ---------- Dashboard ----------
+  function updateDashboard() {
+    const mastered = state.cards.filter(c => c.level >= LEVEL_INTERVALS.length - 1).length;
+    document.getElementById('dash-flash-text').textContent = `${mastered} / ${flashcards.length}`;
+    document.getElementById('dash-flash-bar').style.width = Math.round((mastered / flashcards.length) * 100) + '%';
+
+    if (state.qcmBest > 0) {
+      document.getElementById('dash-qcm-text').textContent = `${state.qcmBest} / ${qcm.length}`;
+      document.getElementById('dash-qcm-bar').style.width = Math.round((state.qcmBest / qcm.length) * 100) + '%';
+    } else {
+      document.getElementById('dash-qcm-text').textContent = 'Non tenté';
+      document.getElementById('dash-qcm-bar').style.width = '0%';
+    }
+
+    const validatedCount = redacQuestions.filter((_, i) => isValidated(i)).length;
+    document.getElementById('dash-redac-text').textContent = `${validatedCount} / ${redacQuestions.length}`;
+    document.getElementById('dash-redac-bar').style.width = Math.round((validatedCount / redacQuestions.length) * 100) + '%';
+  }
+
+  function renderCalendar() {
+    const steps = [
+      { tag: 'Jour J', offset: 0 },
+      { tag: 'J+1', offset: 1 },
+      { tag: 'J+3', offset: 3 },
+      { tag: 'J+7', offset: 7 },
+      { tag: 'J+15', offset: 15 },
+    ];
+    const el = document.getElementById('calendar-steps');
+    el.innerHTML = '';
+    steps.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'calendar-step';
+      div.innerHTML = `<div class="tag">${s.tag}</div><div class="date">${fmtDate(addDaysISO(s.offset))}</div>`;
+      el.appendChild(div);
+    });
+  }
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (confirm('Réinitialiser toute ta progression (flashcards, QCM, rédactions) ? Cette action est irréversible.')) {
+      localStorage.removeItem(STORAGE_KEY);
+      state = {
+        cards: flashcards.map(() => ({ level: 0, nextReview: todayISO() })),
+        qcmBest: 0,
+        redac: redacQuestions.map(() => ({ text: '', checklist: [] })),
+      };
+      save();
+      fIndex = 0; qIndex = 0; qAnswers = []; rIndex = 0;
+      renderFlash(); renderQcm(); renderRedac(); updateDashboard();
+    }
+  });
+
+  // ---------- Initialisation ----------
+  renderFlash();
+  renderQcm();
+  renderRedac();
+  renderCalendar();
+  updateDashboard();
+})();
+</script>
+
+</body>
+</html>
